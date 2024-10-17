@@ -37,6 +37,10 @@ def summarize_spending(data):
     print("\nSpending Summary by Category:")
     print(category_summary)
 
+# Common categories for budgets
+common_categories = ["Groceries", "Rent", "Entertainment", "Utilities", "Transportation"]
+
+
 #Check the budget for each category
 def check_budget(data, budgets):
     category_spending = data.groupby('Category')['Amount'].sum()
@@ -49,6 +53,21 @@ def check_budget(data, budgets):
         else:
             print(f"Under budget for {category}: Spent {format_currency(spent)}, Remaining: {format_currency(budget - spent)}")
 
+#Function allows the user to input their budget for each catagory
+def set_budgets(budgets):
+    print("\nSetting or Changing Budgets:")
+
+    for category in common_categories:
+        # Prompt the user to set or change the budget for each category
+        try:
+            budget_input = input(f"Enter budget for {category} (current: {budgets.get(category, 'not set')}): ")
+            if budget_input:
+                budgets[category] = float(budget_input)
+        except ValueError:
+            print(f"Invalid input for {category}. Please enter a valid number.")
+
+    print("Budgets updated!")
+    return budgets
 #Format currency
 def format_currency(amount):
     return f"${amount:,.2f}"
@@ -68,7 +87,8 @@ def menu():
     print("2. View all transactions")
     print("3. View spending summary")
     print("4. Check budget")
-    print("5. Exit")
+    print("5. Set or change budgets")
+    print("6. Exit")
 
     choice = input("Choose an option: ")
     return choice
@@ -94,7 +114,7 @@ while True:
             print("Invalid date format. Please try again.")
             date = input("Enter date (YYYY-MM-DD): ")
 
-        type_ = imput("Enter type (Income/Expense): ").capitalize()
+        type_ = input("Enter type (Income/Expense): ").capitalize()
         while type_ not in ["Income", "Expense"]:
             print("Invalid type. Please enter 'Income' or 'Expense'.")
             type_ = input("Enter type (Income/Expense): ").capitalize()
@@ -129,6 +149,10 @@ while True:
         check_budget(data, budgets)
 
     elif choice == "5":
+        # Set or change budgets
+        budgets = set_budgets(budgets)
+
+    elif choice == "6":
         # Exit the app
         print("Goodbye!")
         break
