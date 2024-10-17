@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime
+from plaid_integration import create_link_token, fetch_transactions
 
 #Load transactions from CSV (if the file exists)
 def load_transactions():
@@ -11,6 +12,71 @@ def load_transactions():
 # Save transactions to CSV
 def save_transactions(data):
     data.to_csv('transactions.csv', index=False)  # Save the DataFrame to a CSV file
+
+# Delete transaction
+def delete_transaction(data):
+    view_transactions(data)  # Show all transactions
+    try:
+        index = int(input("Enter the index of the transaction to delete: "))
+        data = data.drop(index=index)
+        save_transactions(data)
+        print("Transaction deleted.")
+    except ValueError:
+        print("Invalid input.")
+    return data #add a menu option to delete data and add edit option
+
+#Edit transaction
+def edit_transaction(data):
+    view_transactions(data)  # Show all transactions
+    try:
+        index = int(input("Enter the index of the transaction to edit: "))
+        if index < 0 or index >= len(data):
+            print("Invalid index.")
+            return data
+        # Allow editing of the transaction fields
+        print("Leave the field blank if no changes are needed.")
+        new_date = input(f"Enter new date (YYYY-MM-DD) or press Enter to keep [{data.iloc[index]['Date']}]: ")
+        if new_date:
+            while not validate_date(new_date):
+                print("Invalid date format. Please try again.")
+                new_date = input(f"Enter new date (YYYY-MM-DD): ")
+
+        new_type = input(f"Enter new type (Income/Expense) or press Enter to keep [{data.iloc[index]['Type']}]: ").capitalize()
+        if new_type and new_type not in ["Income", "Expense"]:
+            print("Invalid type. Please enter 'Income' or 'Expense'.")
+            return data
+
+        new_amount = input(f"Enter new amount or press Enter to keep [{format_currency(data.iloc[index]['Amount'])}]: ")
+        if new_amount:
+            try:
+                new_amount = float(new_amount.replace('$', '').replace(',', ''))
+                if new_amount < 0:
+                    print("Amount must be positive.")
+                    return data
+            except ValueError:
+                print("Invalid amount.")
+                return data
+
+        new_category = input(f"Enter new category or press Enter to keep [{data.iloc[index]['Category']}]: ")
+        new_description = input(f"Enter new description or press Enter to keep [{data.iloc[index]['Description']}]: ")
+
+       # Apply changes
+        if new_date:
+            data.at[index, 'Date'] = new_date
+        if new_type:
+            data.at[index, 'Type'] = new_type
+        if new_amount:
+            data.at[index, 'Amount'] = new_amount
+        if new_category:
+            data.at[index, 'Category'] = new_category
+        if new_description:
+            data.at[index, 'Description'] = new_description
+
+        save_transactions(data)
+        print("Transaction updated.")
+    except ValueError:
+        print("Invalid input.")
+    return data
 
 # Add a new transaction
 def add_transaction(data, date, type_, amount, category, description):
@@ -28,7 +94,11 @@ def add_transaction(data, date, type_, amount, category, description):
 
 # View all transactions
 def view_transactions(data):
-    print(data)  # Simply prints the DataFrame containing all transactions
+    if data.empty:
+        print("No transactions available.")
+    else:
+        print("\nTransactions:")
+        print(data.to_string(index=False, formatters={'Amount': format_currency}))
 
 #Summarize spending by category
 def summarize_spending(data):
@@ -38,7 +108,7 @@ def summarize_spending(data):
     print(category_summary)
 
 # Common categories for budgets
-common_categories = ["Groceries", "Rent", "Entertainment", "Utilities", "Transportation"]
+common_categories = ["Groceries", "Rent", "Entertainment", "Utilities", "Transportation"] #add or delete budget catagories for the future
 
 
 #Check the budget for each category
@@ -88,7 +158,10 @@ def menu():
     print("3. View spending summary")
     print("4. Check budget")
     print("5. Set or change budgets")
-    print("6. Exit")
+    print("6. Edit a transaction")
+    print("7. Delete a transaction")
+    print("8. Fetch transactions from Plaid")
+    print("9. Exit")
 
     choice = input("Choose an option: ")
     return choice
@@ -153,6 +226,19 @@ while True:
         budgets = set_budgets(budgets)
 
     elif choice == "6":
+        # Edit a transaction
+        data = edit_transaction(data)
+
+    elif choice == "7":
+        # Delete a transaction
+        data = delete_transaction(data)
+
+    elif choice == "8":
+        #Fetch transactions from Plaid
+        link_token = create_link_token()
+        print(f"Link Token: {link_token}")
+
+    elif choice == "9":
         # Exit the app
         print("Goodbye!")
         break
