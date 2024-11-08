@@ -1,6 +1,12 @@
 import pandas as pd
 from datetime import datetime
-from plaid_integration import create_link_token, fetch_transactions
+from plaid_integration import create_link_token, fetch_transactions, exchange_public_token
+import certifi
+import ssl
+import urllib3
+
+# Ensure Python uses certifi's certificate bundle
+urllib3.util.ssl_.DEFAULT_CA_BUNDLE_PATH = certifi.where()
 
 #Load transactions from CSV (if the file exists)
 def load_transactions():
@@ -116,12 +122,16 @@ def check_budget(data, budgets):
     category_spending = data.groupby('Category')['Amount'].sum()
 
     print("\nBudget Check:")
-    for category, budget in budgets.items():
-        spent = category_spending.get(category, 0)  # Get spending or 0 if no spending
-        if spent > budget:
-            print(f"Over budget for {category}: Spent {format_currency(spent)}, Budget was {format_currency(budget)}")
+    for category, spent in category_spending.items():
+        if category not in budgets:
+            # Add new category to budgets with default value
+            print(f"New category '{category}' detected. Adding to budgets.")
+            budgets[category] = float(input(f"Enter budget for {category}: "))
+
+        if spent > budgets[category]:
+            print(f"Over budget for {category}: Spent {format_currency(spent)}, Budget was {format_currency(budgets[category])}")
         else:
-            print(f"Under budget for {category}: Spent {format_currency(spent)}, Remaining: {format_currency(budget - spent)}")
+            print(f"Under budget for {category}: Spent {format_currency(spent)}, Remaining: {format_currency(budgets[category] - spent)}")
 
 #Function allows the user to input their budget for each catagory
 def set_budgets(budgets):
@@ -234,9 +244,28 @@ while True:
         data = delete_transaction(data)
 
     elif choice == "8":
-        #Fetch transactions from Plaid
+        # Fetch transactions from Plaid
         link_token = create_link_token()
         print(f"Link Token: {link_token}")
+
+        # Simulate getting a public token after user links account
+        public_token = input("Enter the public token after linking the account: ")
+
+        # Exchange public token for access token
+        try:
+            access_token = exchange_public_token(public_token)
+            print(f"Access Token: {access_token}")
+        except Exception as e:
+            print(f"Error fetching access token: {e}")
+            continue  # Skip the rest of this block if there's an error
+
+        # Fetch and display transactions using the access token
+        try:
+            transactions = fetch_transactions(access_token)
+            for txn in transactions:
+                print(f"Name: {txn['name']}, Amount: {txn['amount']}, Date: {txn['date']}")
+        except Exception as e:
+            print(f"Error fetching transactions: {e}")
 
     elif choice == "9":
         # Exit the app
