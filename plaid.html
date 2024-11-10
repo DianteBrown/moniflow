@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plaid Integration - MoniFlow</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+            text-align: center;
+            padding-top: 50px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+</head>
+<body>
+    <h1>Connect Your Bank Account</h1>
+    <p>Securely connect your bank to MoniFlow using Plaid.</p>
+    <button id="linkButton">Connect with Plaid</button>
+
+    <script>
+        // Replace 'YOUR_PUBLIC_KEY' with your actual public key from Plaid
+        const handler = Plaid.create({
+            token: 'YOUR_PUBLIC_LINK_TOKEN', // You need to generate this server-side and pass it to the client
+            onSuccess: function(public_token, metadata) {
+                // Send the public_token to your server and exchange it for an access_token
+                console.log('Public Token:', public_token);
+                alert('Bank connected successfully!');
+            },
+            onExit: function(err, metadata) {
+                if (err != null) {
+                    console.error('Exit with error:', err);
+                }
+            },
+            onEvent: function(eventName, metadata) {
+                console.log('Event:', eventName, 'Metadata:', metadata);
+            }
+        });
+
+        document.getElementById('linkButton').onclick = function() {
+            handler.open();
+        };
+    </script>
+</body>
+</html>
