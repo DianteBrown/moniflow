@@ -32,22 +32,18 @@
     <button id="linkButton">Connect with Plaid</button>
 
     <script>
-        async function initializePlaidLink() {
+        document.getElementById('linkButton').onclick = async function() {
             try {
-                // Fetch the link token from the server
+                // Fetch the Link Token from the Google Cloud Function
                 const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction');
                 const data = await response.json();
-                
-                // Check if the link token is provided
-                if (!data.link_token) {
-                    throw new Error('Link token not available');
-                }
+                const linkToken = data.link_token;
 
                 // Initialize Plaid with the retrieved link token
                 const handler = Plaid.create({
-                    token: data.link_token, 
+                    token: linkToken,
                     onSuccess: function(public_token, metadata) {
-                        // Send the public_token to your server and exchange it for an access_token
+                        // Send the public_token to your server to exchange for an access_token
                         console.log('Public Token:', public_token);
                         alert('Bank connected successfully!');
                     },
@@ -60,20 +56,12 @@
                         console.log('Event:', eventName, 'Metadata:', metadata);
                     }
                 });
-
-                // Open the Plaid Link handler when the button is clicked
-                document.getElementById('linkButton').onclick = function() {
-                    handler.open();
-                };
-
+                handler.open();
             } catch (error) {
-                console.error('Error initializing Plaid Link:', error);
-                alert('Failed to initialize Plaid Link.');
+                console.error('Error fetching Link Token:', error);
+                alert('Unable to initiate Plaid Link. Please try again later.');
             }
-        }
-
-        // Initialize Plaid Link when the page loads
-        window.onload = initializePlaidLink;
+        };
     </script>
 </body>
 </html>
