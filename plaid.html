@@ -32,27 +32,48 @@
     <button id="linkButton">Connect with Plaid</button>
 
     <script>
-        // Replace 'YOUR_PUBLIC_KEY' with your actual public key from Plaid
-        const handler = Plaid.create({
-            token: 'YOUR_PUBLIC_LINK_TOKEN', // You need to generate this server-side and pass it to the client
-            onSuccess: function(public_token, metadata) {
-                // Send the public_token to your server and exchange it for an access_token
-                console.log('Public Token:', public_token);
-                alert('Bank connected successfully!');
-            },
-            onExit: function(err, metadata) {
-                if (err != null) {
-                    console.error('Exit with error:', err);
+        async function initializePlaidLink() {
+            try {
+                // Fetch the link token from the server
+                const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction');
+                const data = await response.json();
+                
+                // Check if the link token is provided
+                if (!data.link_token) {
+                    throw new Error('Link token not available');
                 }
-            },
-            onEvent: function(eventName, metadata) {
-                console.log('Event:', eventName, 'Metadata:', metadata);
-            }
-        });
 
-        document.getElementById('linkButton').onclick = function() {
-            handler.open();
-        };
+                // Initialize Plaid with the retrieved link token
+                const handler = Plaid.create({
+                    token: data.link_token, 
+                    onSuccess: function(public_token, metadata) {
+                        // Send the public_token to your server and exchange it for an access_token
+                        console.log('Public Token:', public_token);
+                        alert('Bank connected successfully!');
+                    },
+                    onExit: function(err, metadata) {
+                        if (err != null) {
+                            console.error('Exit with error:', err);
+                        }
+                    },
+                    onEvent: function(eventName, metadata) {
+                        console.log('Event:', eventName, 'Metadata:', metadata);
+                    }
+                });
+
+                // Open the Plaid Link handler when the button is clicked
+                document.getElementById('linkButton').onclick = function() {
+                    handler.open();
+                };
+
+            } catch (error) {
+                console.error('Error initializing Plaid Link:', error);
+                alert('Failed to initialize Plaid Link.');
+            }
+        }
+
+        // Initialize Plaid Link when the page loads
+        window.onload = initializePlaidLink;
     </script>
 </body>
 </html>
