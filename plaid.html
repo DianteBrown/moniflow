@@ -23,6 +23,11 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        #statusMessage {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
     </style>
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 </head>
@@ -30,33 +35,49 @@
     <h1>Connect Your Bank Account</h1>
     <p>Securely connect your bank to MoniFlow using Plaid.</p>
     <button id="linkButton">Connect with Plaid</button>
+    <div id="statusMessage">Waiting to connect...</div>
 
     <script>
-      document.getElementById('linkButton').onclick = function() {
-        fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/create_link_token')
-          .then(response => response.json())
-          .then(data => {
-            const handler = Plaid.create({
-              token: data.link_token,
-              onSuccess: function(public_token, metadata) {
-                console.log('Public Token:', public_token);
-                alert('Bank connected successfully!');
-              },
-              onExit: function(err, metadata) {
-                if (err != null) {
-                  console.error('Exit with error:', err);
-                }
-              },
-              onEvent: function(eventName, metadata) {
-                console.log('Event:', eventName, 'Metadata:', metadata);
+      document.getElementById('linkButton').onclick = async function() {
+          const statusMessage = document.getElementById('statusMessage');
+
+          try {
+              statusMessage.textContent = "Fetching link token from server...";
+              const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/create_link_token');
+              if (!response.ok) {
+                  throw new Error(`Server error: ${response.status}`);
               }
-            });
-            handler.open();
-          })
-          .catch(error => {
-            console.error('Error fetching link_token:', error);
-            alert('Unable to initiate Plaid Link. Please try again later.');
-          });
+              const data = await response.json();
+              const linkToken = data.link_token;
+              console.log("Link Token from server:", linkToken);
+              statusMessage.textContent = "Link token received, initializing Plaid Link...";
+
+              // Initialize Plaid Link with the received link token
+              const handler = Plaid.create({
+                  token: linkToken,
+                  onSuccess: function(public_token, metadata) {
+                      console.log('Public Token:', public_token);
+                      statusMessage.textContent = "Bank connected successfully!";
+                      alert('Bank connected successfully!');
+                  },
+                  onExit: function(err, metadata) {
+                      if (err != null) {
+                          console.error('Exit with error:', err);
+                          statusMessage.textContent = "Exited with an error.";
+                      } else {
+                          statusMessage.textContent = "Exited Plaid Link.";
+                      }
+                  },
+                  onEvent: function(eventName, metadata) {
+                      console.log('Event:', eventName, 'Metadata:', metadata);
+                  }
+              });
+              handler.open();
+          } catch (error) {
+              console.error('Error fetching Link Token or initializing Plaid Link:', error);
+              statusMessage.textContent = "Unable to initiate Plaid Link. Please try again later.";
+              alert('Unable to initiate Plaid Link. Please try again later.');
+          }
       };
     </script>
 </body>
