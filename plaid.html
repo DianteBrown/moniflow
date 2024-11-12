@@ -32,36 +32,32 @@
     <button id="linkButton">Connect with Plaid</button>
 
     <script>
-        document.getElementById('linkButton').onclick = async function() {
-            try {
-                // Fetch the Link Token from the Google Cloud Function
-                const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/create_link_token');
-                const data = await response.json();
-                const linkToken = data.link_token;
-
-                // Initialize Plaid with the retrieved link token
-                const handler = Plaid.create({
-                    token: linkToken,
-                    onSuccess: function(public_token, metadata) {
-                        // Send the public_token to your server to exchange for an access_token
-                        console.log('Public Token:', public_token);
-                        alert('Bank connected successfully!');
-                    },
-                    onExit: function(err, metadata) {
-                        if (err != null) {
-                            console.error('Exit with error:', err);
-                        }
-                    },
-                    onEvent: function(eventName, metadata) {
-                        console.log('Event:', eventName, 'Metadata:', metadata);
-                    }
-                });
-                handler.open();
-            } catch (error) {
-                console.error('Error fetching Link Token:', error);
-                alert('Unable to initiate Plaid Link. Please try again later.');
-            }
-        };
+      document.getElementById('linkButton').onclick = function() {
+        fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/create_link_token')
+          .then(response => response.json())
+          .then(data => {
+            const handler = Plaid.create({
+              token: data.link_token,
+              onSuccess: function(public_token, metadata) {
+                console.log('Public Token:', public_token);
+                alert('Bank connected successfully!');
+              },
+              onExit: function(err, metadata) {
+                if (err != null) {
+                  console.error('Exit with error:', err);
+                }
+              },
+              onEvent: function(eventName, metadata) {
+                console.log('Event:', eventName, 'Metadata:', metadata);
+              }
+            });
+            handler.open();
+          })
+          .catch(error => {
+            console.error('Error fetching link_token:', error);
+            alert('Unable to initiate Plaid Link. Please try again later.');
+          });
+      };
     </script>
 </body>
 </html>
