@@ -46,50 +46,52 @@
                 statusMessage.textContent = "Fetching link token from server...";
                 console.log("Attempting to fetch link token from server...");
 
-                const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/create_link_token');
-                if (!response.ok) {
-                    throw new Error(`Server error: ${response.status}`);
-                }
+                // Fetch link token with additional debugging output
+                fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/create_link_token')
+                  .then(response => response.json())
+                  .then(data => {
+                      console.log("Link Token:", data.link_token);
+                      const linkToken = data.link_token;
 
-                const data = await response.json();
-                const linkToken = data.link_token;
+                      if (linkToken) {
+                          statusMessage.textContent = "Link token received, initializing Plaid Link...";
+                          
+                          // Initialize Plaid Link with the received link token
+                          const handler = Plaid.create({
+                              token: linkToken,
+                              onSuccess: function(public_token, metadata) {
+                                  console.log('Plaid Link Success! Public Token:', public_token);
+                                  statusMessage.textContent = "Bank connected successfully!";
+                                  alert('Bank connected successfully!');
+                              },
+                              onExit: function(err, metadata) {
+                                  if (err != null) {
+                                      console.error('Exit with error:', err);
+                                      statusMessage.textContent = "Exited with an error: " + err.message;
+                                  } else {
+                                      console.log("Exited Plaid Link without errors.");
+                                      statusMessage.textContent = "Exited Plaid Link.";
+                                  }
+                              },
+                              onEvent: function(eventName, metadata) {
+                                  console.log('Plaid Link Event:', eventName, 'Metadata:', metadata);
+                                  statusMessage.textContent = `Plaid Link Event: ${eventName}`;
+                              }
+                          });
 
-                if (linkToken) {
-                    console.log("Link Token received from server:", linkToken);
-                    statusMessage.textContent = "Link token received, initializing Plaid Link...";
-                } else {
-                    console.error("Failed to receive a valid link token from the server.");
-                    statusMessage.textContent = "Failed to receive a valid link token.";
-                    return;
-                }
-
-                // Step 2: Initialize Plaid Link with the received link token
-                const handler = Plaid.create({
-                    token: linkToken,
-                    onSuccess: function(public_token, metadata) {
-                        console.log('Plaid Link Success! Public Token:', public_token);
-                        statusMessage.textContent = "Bank connected successfully!";
-                        alert('Bank connected successfully!');
-                    },
-                    onExit: function(err, metadata) {
-                        if (err != null) {
-                            console.error('Exit with error:', err);
-                            statusMessage.textContent = "Exited with an error: " + err.message;
-                        } else {
-                            console.log("Exited Plaid Link without errors.");
-                            statusMessage.textContent = "Exited Plaid Link.";
-                        }
-                    },
-                    onEvent: function(eventName, metadata) {
-                        console.log('Plaid Link Event:', eventName, 'Metadata:', metadata);
-                        statusMessage.textContent = `Plaid Link Event: ${eventName}`;
-                    }
-                });
-
-                // Step 3: Open Plaid Link
-                console.log("Opening Plaid Link handler...");
-                statusMessage.textContent = "Opening Plaid Link...";
-                handler.open();
+                          // Open Plaid Link
+                          console.log("Opening Plaid Link handler...");
+                          statusMessage.textContent = "Opening Plaid Link...";
+                          handler.open();
+                      } else {
+                          console.error("Failed to receive a valid link token from the server.");
+                          statusMessage.textContent = "Failed to receive a valid link token.";
+                      }
+                  })
+                  .catch(error => {
+                      console.error("Error fetching link token:", error);
+                      statusMessage.textContent = "Error fetching link token. Please try again later.";
+                  });
             } catch (error) {
                 console.error('Error encountered:', error);
                 statusMessage.textContent = "Unable to initiate Plaid Link. Please try again later.";
