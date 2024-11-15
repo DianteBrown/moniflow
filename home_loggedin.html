@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Home - MoniFlow</title>
+</head>
+<body>
+    <header>
+        <h1>Welcome Back to MoniFlow</h1>
+        <p>Access your dashboard and manage your finances effortlessly.</p>
+    </header>
+    <nav>
+        <a href="home_loggedin.html">Home</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="contacts.html">Contact</a>
+        <a href="#" id="logoutLink">Logout</a>
+    </nav>
+    <main>
+        <h2>Dashboard Overview</h2>
+        <p>Track your transactions, set budgets, and achieve your financial goals.</p>
+    </main>
+    <footer>
+        <p>&copy; 2024 MoniFlow. All rights reserved.</p>
+    </footer>
+    <script>
+        // Logout functionality
+        document.getElementById('logoutLink').addEventListener('click', () => {
+            localStorage.removeItem('loggedIn'); // Clear login status
+            alert('Logged out successfully!');
+            window.location.href = 'index.html'; // Redirect to non-logged-in home
+        });
+    </script>
+</body>
+</html>
