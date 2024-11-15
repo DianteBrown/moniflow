@@ -1,10 +1,13 @@
-<h1>Welcome to Your Dashboard</h1>
-<div id="userTransactions"></div>
-<script>
-    async function loadUserData() {
-        const response = await fetch('/user_transactions');
-        const transactions = await response.json();
-        // Populate the user's data dynamically
-    }
-    loadUserData();
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to your Dashboard</h1>
+    <button id="logoutButton">Logout</button>
+</body>
+<script src="dashboard.js"></script>
+</html>
