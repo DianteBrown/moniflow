@@ -1,0 +1,16 @@
+<h1>Welcome, User!</h1>
+<div id="transactionList"></div>
+<script>
+    async function loadTransactions() {
+        const userId = localStorage.getItem('user_id');
+        const response = await fetch('/fetch_transactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId })
+        });
+        const transactions = await response.json();
+        // Render transactions in the UI
+        console.log(transactions);
+    }
+    document.addEventListener('DOMContentLoaded', loadTransactions);
+</script>
