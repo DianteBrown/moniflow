@@ -1,16 +1,10 @@
-<h1>Welcome, User!</h1>
-<div id="transactionList"></div>
+<h1>Welcome to Your Dashboard</h1>
+<div id="userTransactions"></div>
 <script>
-    async function loadTransactions() {
-        const userId = localStorage.getItem('user_id');
-        const response = await fetch('/fetch_transactions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: userId })
-        });
+    async function loadUserData() {
+        const response = await fetch('/user_transactions');
         const transactions = await response.json();
-        // Render transactions in the UI
-        console.log(transactions);
+        // Populate the user's data dynamically
     }
-    document.addEventListener('DOMContentLoaded', loadTransactions);
+    loadUserData();
 </script>
