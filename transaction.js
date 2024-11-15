@@ -7,6 +7,12 @@ async function loadTransactions() {
         const tableBody = document.getElementById('transactionTable').querySelector('tbody');
         tableBody.innerHTML = '';  // Clear existing rows
 
+        if (transactions.length === 0) {
+            // Display message if no transactions are available
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No transactions available</td></tr>`;
+            return;
+        }
+
         transactions.forEach(transaction => {
             const row = document.createElement('tr');
             row.innerHTML = `
