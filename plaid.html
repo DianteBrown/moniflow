@@ -26,6 +26,13 @@
             font-size: 14px;
             color: #666;
         }
+        .nav-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
     </style>
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 </head>
@@ -33,6 +40,9 @@
     <h1>Connect Your Bank Account</h1>
     <button id="linkButton">Connect with Plaid</button>
     <div id="statusMessage">Waiting to connect...</div>
+
+    <!-- Link to transaction.html -->
+    <a href="transaction.html" class="nav-link">View Transactions</a>
 
     <script>
         document.getElementById('linkButton').onclick = async function() {
