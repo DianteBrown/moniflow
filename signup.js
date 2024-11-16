@@ -1,12 +1,12 @@
 document.getElementById('signupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const username = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    // Basic client-side validation
-    if (!email || !password) {
-        alert('Both email and password are required.');
+    if (!username || !email || !password) {
+        alert('All fields are required.');
         return;
     }
 
@@ -14,7 +14,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
         const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ username, email, password }),
         });
 
         if (!response.ok) {
@@ -26,7 +26,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
         alert('Signup successful! Please log in.');
         window.location.href = '/login.html';
     } catch (error) {
-        console.error('Error signing up:', error);
+        console.error('Error signing up:', error.message);
         alert(error.message || 'An error occurred during signup. Please try again.');
     }
 });
