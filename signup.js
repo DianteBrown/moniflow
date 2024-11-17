@@ -11,7 +11,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
     }
 
     try {
-        const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/signup', {
+        const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/main', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, email, password }),
