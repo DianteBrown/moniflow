@@ -41,5 +41,18 @@ function getSignupFormErrors(username, email, password, repeatPassword){
         errors.push('password is required');
         password_input.parentElement.classList.add('incorrect');
     }
+    if (password !== repeatPassword){
+      errors.push('Password does not match repeated password');
+    }
     return errors;
 }
+const allInputs = [username_input,email_input,password_input,repeat_password_input];
+
+allInputs.forEach(input => {
+  input.addEventListener('input', () => {
+    if(input.parentElement.classList.contains('incorrect')){
+      input.parentElement.classList.remove('incorrect');
+      error_message.innerText = '';
+    }
+  });
+});
