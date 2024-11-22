@@ -42,35 +42,24 @@ function getSignupFormErrors(username, email, password, repeatPassword){
 }
 
 
+    //try {
+//    //    const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/signup', {
+//    //        method: 'POST',
+//            headers: { 'Content-Type': 'application/json' },
+//            body: JSON.stringify({ username, email, password }),
+//            credentials: 'include',//
+//        });
+//
+//        if (!response.ok) {
+//            const errorData = await response.json();
+//            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+//        }
 
-
-
-
-        
-
-   // if (!username || !email || !password) {
-        alert('All fields are required.');
-        return;
-    }
-
-    try {
-        const response = await fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, email, password }),
-            credentials: 'include',
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        alert('Signup successful! Please log in.');
-        window.location.href = '/login.html';
-    } catch (error) {
-        console.error('Error signing up:', error.message);
-        alert(error.message || 'An error occurred during signup. Please try again.');
-    }
-});
+//        const data = await response.json();
+//        alert('Signup successful! Please log in.');
+//        window.location.href = '/login.html';
+//    } catch (error) {
+//        console.error('Error signing up:', error.message);
+//        alert(error.message || 'An error occurred during signup. Please try again.');
+//    }
+// });
