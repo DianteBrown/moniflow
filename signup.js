@@ -1,11 +1,54 @@
-document.getElementById('signupForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+const form = document.getElementById('signupForm')
+const username_input = document.getElementById('username-input')
+const email_input = document.getElementById('email-input')
+const password_input = document.getElementById('password-input')
+const repeat_password_input = document.getElementById('repeat-password-input')
 
-    const username = document.getElementById('username').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+form.addEventListener('submit', async (e) => {
 
-    if (!username || !email || !password) {
+
+    let errors = []
+
+    if(username){
+        //If we have a first name input then we are in the signup
+        errors = getSignupFormErrors(username_input.value, email_input.value, password_input.value, repeat_password_input.value)
+    }
+    else{
+        // If we don't have a first name input then we are in the Login
+        errors = getLoginFormErrors(email_input.value, password_input.value)
+    }
+
+    if(errors.length > 0){
+        // If there are any errors
+        e.preventDefault()
+})
+        
+function getSignupFormErrors(username, email, password, repeatPassword){
+    let errors = []
+
+    if(username ==='' || username == null){
+        errors.push('username is required')
+        username_input.parentElement.classList.add('incorrect')
+    }
+    if(email ==='' || email == null){
+        errors.push('email is required')
+        email_input.parentElement.classList.add('incorrect')
+    }
+    if(password ==='' || password == null){
+        errors.push('password is required')
+        password_input.parentElement.classList.add('incorrect')
+    }
+    return errors;
+}
+
+
+
+
+
+
+        
+
+   // if (!username || !email || !password) {
         alert('All fields are required.');
         return;
     }
