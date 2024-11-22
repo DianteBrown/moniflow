@@ -41,6 +41,10 @@ function getSignupFormErrors(username, email, password, repeatPassword){
         errors.push('password is required');
         password_input.parentElement.classList.add('incorrect');
     }
+    if(password.length < 8){
+      errors.push('Password must have at least 8 characters');
+      password_input.parentElement.classList.add('incorrect')
+    }
     if (password !== repeatPassword){
       errors.push('Password does not match repeated password');
     }
@@ -56,3 +60,4 @@ allInputs.forEach(input => {
     }
   });
 });
+
