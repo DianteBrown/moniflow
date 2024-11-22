@@ -74,4 +74,3 @@ allInputs.forEach(input => {
     }
   });
 });
-
