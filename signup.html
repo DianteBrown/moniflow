@@ -20,14 +20,23 @@
         <a href="login.html">login</a>
     </nav>
     <main>
+        <h1>Signup</h1>
         <form id="signupForm">
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit">Sign Up</button>
+            <div>
+                <input type="text" name="username" id="username-input" placeholder="Username" required>    
+            </div>
+            <div>
+                <input type="email" name="email" id="email-input" placeholder="Email" required>        
+            </div>
+            <div>
+                <input type="password" name="password" id="password-input" placeholder="Password" required>
+            </div>
+            
+            <div>
+                <input type="password" name="repeat-password" id="repeat-password-input" placeholder="Repeat Password" required>
+            </div>
+            <button type="submit">SignUp</button>
         </form>
-        <p>Already have an account? <a href="login.html">Log in here</a></p>
-        <p><a href="index.html">Back to Home</a></p>
     </main>
     <footer>
         <p>&copy; 2024 MoniFlow. All rights reserved.</p>
