@@ -6,8 +6,6 @@ const repeat_password_input = document.getElementById('repeat-password-input');
 const error_message = document.getElementById('error-message');
 
 form.addEventListener('submit', async (e) => {
-
-
     let errors = [];
 
     if(username_input){
@@ -24,6 +22,26 @@ form.addEventListener('submit', async (e) => {
         e.preventDefault();
         error_message.innerText = errors.join('.');
     }
+
+    fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username_input.value,
+        email: email_input.value,
+        password: password_input.value
+      })
+    }).then(response => {
+      if( response.ok ) {
+        alert('Registered Successfully!');
+      } else {
+        alert(`HTTP ERROR: ${response.status}`);
+      }
+    }).catch(err => {
+      console.log('signup error', err);
+    })
 });
 
 function getSignupFormErrors(username, email, password, repeatPassword){
