@@ -6,6 +6,7 @@ const repeat_password_input = document.getElementById('repeat-password-input');
 const error_message = document.getElementById('error-message');
 
 form.addEventListener('submit', async (e) => {
+  e.preventDefault();
     let errors = [];
 
     if(username_input){
@@ -19,7 +20,6 @@ form.addEventListener('submit', async (e) => {
 
     if(errors.length > 0){
         // If there are any errors
-        e.preventDefault();
         error_message.innerText = errors.join('.');
     }
 
