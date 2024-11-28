@@ -23,7 +23,7 @@ form.addEventListener('submit', async (e) => {
         error_message.innerText = errors.join('.');
     }
 
-    fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/signup', {
+    fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/signup/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
