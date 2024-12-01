@@ -17,8 +17,10 @@ form.addEventListener("submit", async (e) => {
       password_input.value,
       repeat_password_input.value
     );
-  } else {
+  } else if (repeat_password_input) {
     // If we don't have a first name input then we are in the Login
+    errors = getRestPasswordFormErrors(email_input.value, password_input.value);
+  } else {
     errors = getLoginFormErrors(email_input.value, password_input.value);
   }
 
@@ -56,6 +58,32 @@ form.addEventListener("submit", async (e) => {
       .catch((err) => {
         console.log("signup error", err);
       });
+  } else if ( repeat_password_input ) {
+    fetch(
+      `${url}/reset-password`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email_input.value,
+          password: password_input.value,
+        }),
+      }
+    )
+      .then( async (response) => {
+        if (response.ok) {
+          alert("Reset password Successfully!");
+          window.location.href = "login.html"
+        } else {
+          const errorData = await response.json();
+          alert(`${errorData['error']}`);
+        }
+      })
+      .catch((err) => {
+        console.log("Reset Password error", err);
+      });
   } else {
     fetch(
       `${url}/login`,
@@ -91,6 +119,27 @@ function getSignupFormErrors(username, email, password, repeatPassword) {
     errors.push("username is required");
     username_input.parentElement.classList.add("incorrect");
   }
+  if (email === "" || email == null) {
+    errors.push("email is required");
+    email_input.parentElement.classList.add("incorrect");
+  }
+  if (password === "" || password == null) {
+    errors.push("password is required");
+    password_input.parentElement.classList.add("incorrect");
+  }
+  if (password.length < 8) {
+    errors.push("Password must have at least 8 characters");
+    password_input.parentElement.classList.add("incorrect");
+  }
+  if (password !== repeatPassword) {
+    errors.push("Password does not match repeated password");
+  }
+  return errors;
+}
+
+function getRestPasswordFormErrors(username, email, password, repeatPassword) {
+  let errors = [];
+
   if (email === "" || email == null) {
     errors.push("email is required");
     email_input.parentElement.classList.add("incorrect");

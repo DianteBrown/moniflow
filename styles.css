@@ -6,6 +6,7 @@ body {
     background-color: #f4f4f9; /* Soft neutral background */
     color: #333; /* Standard dark text */
     line-height: 1.6;
+    text-align: center;
 }
 
 h1, h2, h3 {
@@ -175,4 +176,8 @@ footer {
     padding: 20px;
     margin-top: 30px;
     position: relative;
-    bottom:
+}
+
+.text-center {
+    text-align: center;
+}
