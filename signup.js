@@ -43,11 +43,14 @@ form.addEventListener("submit", async (e) => {
         }),
       }
     )
-      .then((response) => {
+      .then(async (response) => {
         if (response.ok) {
           alert("Registered Successfully!");
         } else {
-          alert(`HTTP ERROR: ${response.status}`);
+          if (response.status == 409) {
+            const errorData = await response.json();
+            alert(`${errorData['error']}`);
+          } else alert(`HTTP ERROR: ${response.status}`);
         }
       })
       .catch((err) => {
