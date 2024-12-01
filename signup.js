@@ -19,7 +19,7 @@ form.addEventListener("submit", async (e) => {
     );
   } else if (repeat_password_input) {
     // If we don't have a first name input then we are in the Login
-    errors = getRestPasswordFormErrors(email_input.value, password_input.value);
+    errors = getRestPasswordFormErrors(email_input.value, password_input.value, repeat_password_input.value);
   } else {
     errors = getLoginFormErrors(email_input.value, password_input.value);
   }
@@ -137,7 +137,7 @@ function getSignupFormErrors(username, email, password, repeatPassword) {
   return errors;
 }
 
-function getRestPasswordFormErrors(username, email, password, repeatPassword) {
+function getRestPasswordFormErrors(email, password, repeatPassword) {
   let errors = [];
 
   if (email === "" || email == null) {
