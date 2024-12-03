@@ -61,8 +61,8 @@ function displayBudgetData(data) {
     return;
   }
 
-  const listItems = Object.entries(data)
-    .map(([category, amount]) => `<li>${category}: $${amount}</li>`)
+  const listItems = Object.values(data)
+    .map((data) => `<li>${data.category}: $${data.amount}</li>`)
     .join('');
   budgetSummary.innerHTML = `<ul>${listItems}</ul>`;
 }
