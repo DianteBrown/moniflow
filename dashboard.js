@@ -48,6 +48,99 @@ function fetchBudgetData() {
     });
 }
 
+function addTransaction() {
+  const date = document.getElementById('new-date').value;
+  const description = document.getElementById('new-description').value;
+  const category = document.getElementById('new-category').value;
+  const amount = document.getElementById('new-amount').value;
+
+  fetchData('/transactions/add_budget_data', 'POST', {
+    user_id: localStorage.getItem('user_id'),
+    date,
+    description,
+    category,
+    amount
+  })
+    .then((data) => {
+      modal.style.display = "none";
+      alert(data.message);
+      fetchBudgetData();
+    }).catch(err => {
+      console.error("Error adding budget data:", err);
+    })
+}
+
+function removeTransaction(id) {
+  fetchData('/transactions/remove_budget_data', 'POST', {'user_id': localStorage.getItem('user_id'), 'transaction_id': id})
+    .then((data) => {
+      alert("Transaction removed successfully");
+      const transaction = document.getElementById(`transaction-${id}`);
+      transaction.remove();
+    }).catch(err => {
+      console.error("Error removing budget data:", err);
+    })
+}
+
+function editTransaction(id) {
+  console.log('Edit Transaction function called');
+  const date = document.getElementById(`edit-date-${id}`).value;
+  const description = document.getElementById(`edit-description-${id}`).value;
+  const category = document.getElementById(`edit-category-${id}`).value;
+  const amount = document.getElementById(`edit-amount-${id}`).value;
+
+  fetchData('/transactions/edit_budget_data', 'POST', {
+      user_id: localStorage.getItem('user_id'), 
+      transaction_id: id,
+      date,
+      description,
+      category,
+      amount
+    })
+    .then((data) => {
+      alert("Transaction Edit successfully");
+      setInnerHTML(id, date, description, category, amount);
+    }).catch(err => {
+      console.error("Error Editting budget data:", err);
+    })
+
+  const showButton = document.getElementById(`show-edit-btn-${id}`);
+  const editButton = document.getElementById(`edit-transaction-${id}`);
+  
+  showButton.hidden = false;
+  editButton.hidden = true;
+}
+
+function showEditButton(index) {
+  console.log('showEditButton function called');
+  const storedData = JSON.parse(localStorage.getItem('data'));
+  const data = storedData[index]
+  const showButton = document.getElementById(`show-edit-btn-${data.id}`);
+  const editButton = document.getElementById(`edit-transaction-${data.id}`);  
+
+  showButton.hidden = true;
+  editButton.hidden = false;
+
+  setInnerHTML(
+    data.id,
+    `<input type="date" id="edit-date-${data.id}" value="${new Date(data.date).toISOString().split('T')[0]}" />`,
+    `<input type="text" id="edit-description-${data.id}" value="${data.description}" />`,
+    `<input type="text" id="edit-category-${data.id}" value="${data.category}" />`,
+    `<input type="number" id="edit-amount-${data.id}" value="${parseInt(data.amount)}" />`
+  );
+}
+
+function setInnerHTML(id, date, description, category, amount) {
+  const dateElement = document.getElementById(`transaction-date-${id}`);
+  const descriptionElement = document.getElementById(`transaction-description-${id}`);
+  const categoryElement = document.getElementById(`transaction-category-${id}`);
+  const amountElement = document.getElementById(`transaction-amount-${id}`);
+
+  dateElement.innerHTML = `${date}`;
+  descriptionElement.innerHTML = `${description}`;
+  categoryElement.innerHTML = `${category}`;
+  amountElement.innerHTML = `${amount}`;
+}
+
 // Display budgeting data on the page
 function displayBudgetData(data) {
   const budgetSummary = document.getElementById("budget-summary");
@@ -60,11 +153,24 @@ function displayBudgetData(data) {
     budgetSummary.innerHTML = "<p>No budget data available.</p>";
     return;
   }
-
+  
+  localStorage.setItem('data', JSON.stringify(data));
   const listItems = Object.values(data)
-    .map((data) => `<li>${data.category}: $${data.amount}</li>`)
+    .map((data, index) => `
+          <tr id="transaction-${data.id}">
+            <td id="transaction-date-${data.id}">${new Date(data.date).toISOString().split('T')[0]}</td>
+            <td id="transaction-description-${data.id}">${data.description}</td>
+            <td id="transaction-category-${data.id}">${data.category}</td>
+            <td id="transaction-amount-${data.id}">${data.amount}</td>
+            <td>
+              <button onclick="showEditButton(${index})" id="show-edit-btn-${data.id}">Edit</button>
+              <button onclick="editTransaction(${data.id})" id="edit-transaction-${data.id}" hidden="true">Submit</button>
+              <button class="red-btn" onclick="removeTransaction(${data.id})">Remove</button>
+            </td>
+          </tr>
+    `)
     .join('');
-  budgetSummary.innerHTML = `<ul>${listItems}</ul>`;
+  budgetSummary.innerHTML = `${listItems}`;
 }
 
 // Handle user logout
