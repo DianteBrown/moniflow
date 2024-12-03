@@ -98,9 +98,11 @@ form.addEventListener("submit", async (e) => {
         }),
       }
     )
-      .then((response) => {
+      .then(async (response) => {
         if (response.ok) {
           alert("Login Successfully!");
+          const data = await response.json();
+          localStorage.setItem('user_id', data['user_id']);
           window.location.href = "dashboard.html"
         } else {
           alert(`HTTP ERROR: ${response.status}`);
