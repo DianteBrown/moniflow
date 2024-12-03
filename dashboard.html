@@ -16,64 +16,7 @@
       <div id="budget-summary"></div>
     </section>
 
-    <script>
-      const url = "https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction";
-
-      document.addEventListener("DOMContentLoaded", function () {
-        fetch(`${url}/check_auth`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (response.ok) {
-              console.log("Authentication successful");
-              fetchBudgetData(); // Call the function to fetch budgeting data
-            } else {
-              window.location.href = "login.html";
-            }
-          })
-          .catch((err) => {
-            console.log("Login error", err);
-          });
-      });
-
-      // Function to fetch budgeting data
-      function fetchBudgetData() {
-        fetch(`${url}/get_budget_data`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            displayBudgetData(data);
-          })
-          .catch((error) => {
-            console.log("Error fetching budget data:", error);
-          });
-      }
-
-      // Function to display budgeting data
-      function displayBudgetData(data) {
-        const budgetSummary = document.getElementById("budget-summary");
-
-        if (!data || Object.keys(data).length === 0) {
-          budgetSummary.innerHTML = "<p>No budget data available.</p>";
-          return;
-        }
-
-        // Create HTML for budget data
-        let html = `<ul>`;
-        for (const [key, value] of Object.entries(data)) {
-          html += `<li>${key}: $${value}</li>`;
-        }
-        html += `</ul>`;
-
-        budgetSummary.innerHTML = html;
-      }
-    </script>
+    <!-- Link to external JavaScript file -->
+    <script src="dashboard.js"></script>
   </body>
 </html>
