@@ -41,7 +41,7 @@ async function fetchData(endpoint, method = 'GET', body = null) {
 
 // Fetch budgeting data
 function fetchBudgetData() {
-  fetchData('/transactions/get_budget_data', 'GET', {'user_id': localStorage.getItem('user_id')})
+  fetchData('/transactions/get_budget_data', 'POST', {'user_id': localStorage.getItem('user_id')})
     .then(displayBudgetData)
     .catch(error => {
       console.error("Error fetching budget data:", error);
