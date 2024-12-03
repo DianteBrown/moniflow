@@ -41,7 +41,7 @@ async function fetchData(endpoint, method = 'GET', body = null) {
 
 // Fetch budgeting data
 function fetchBudgetData() {
-  fetchData('/get_budget_data')
+  fetchData('/transactions/get_budget_data')
     .then(displayBudgetData)
     .catch(error => {
       console.error("Error fetching budget data:", error);
