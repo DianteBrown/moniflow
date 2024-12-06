@@ -38,10 +38,10 @@
 
     <div class="button-group">
       <button id="addTransactionBtn">Add a new transaction</button>
-      <button>View all transactions</button>
+      <!-- <button>View all transactions</button> -->
       <button id="viewSummaryBtn">View spending summary</button>
-      <button>Check budget</button>
-      <button>Set or change budgets</button>
+      <button id="checkBudgetBtn">Check budget</button>
+      <!-- <button>Set or change budgets</button> -->
       <button>Fetch transactions from Plaid</button>
     </div>
 
@@ -83,12 +83,34 @@
       </div>
     </div>
 
+    <div id="checkBudgetModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="document.getElementById('checkBudgetModal').style.display = 'none'">&times;</span>
+        <h2>Check Budget Goal</h2>
+        <table style="width:100%">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th style="width: 100px;">Budget Goal</th>
+              <th>Spent</th>
+              <th style="max-width: 100px">Remaining /Exceeding</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="check-budget-table">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <script>
       // JavaScript for modal functionality
       const addTransactionModal = document.getElementById("addTransactionModal");
       const viewSummaryModal = document.getElementById("viewSummaryModal");
+      const checkBudgetModal = document.getElementById("checkBudgetModal");
       const openAddTransactionModalButton = document.getElementById("addTransactionBtn");
       const openViewSummaryModalButton = document.getElementById("viewSummaryBtn");
+      const openCheckBudgetModalButton = document.getElementById("checkBudgetBtn");
       const closeModalButton = document.querySelector(".close");
 
       openAddTransactionModalButton.addEventListener("click", () => {
@@ -98,6 +120,11 @@
       openViewSummaryModalButton.addEventListener("click", () => {
         fetchSummaryData();
         viewSummaryModal.style.display = "block";
+      });
+
+      openCheckBudgetModalButton.addEventListener("click", () => {
+        fetchCheckBudget();
+        checkBudgetModal.style.display = "block";
       });
 
       closeModalButton.addEventListener("click", () => {

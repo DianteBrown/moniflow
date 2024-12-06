@@ -56,6 +56,14 @@ function fetchSummaryData() {
     });
 }
 
+function fetchCheckBudget() {
+  fetchData('/transactions/check_budget', 'POST', {'user_id': localStorage.getItem('user_id')})
+    .then(displayCheckBudget)
+    .catch(error => {
+      console.error("Error fetching budget data:", error);
+    });
+}
+
 function addTransaction() {
   const date = document.getElementById('new-date').value;
   const description = document.getElementById('new-description').value;
@@ -70,7 +78,7 @@ function addTransaction() {
     amount
   })
     .then((data) => {
-      modal.style.display = "none";
+      document.getElementById("addTransactionModal").style.display = "none";
       alert(data.message);
       fetchBudgetData();
     }).catch(err => {
@@ -149,6 +157,50 @@ function setInnerHTML(id, date, description, category, amount) {
   amountElement.innerHTML = `${amount}`;
 }
 
+function submitBudgetGoal(category) {
+  const budget_goals = JSON.parse(localStorage.getItem('budget-goals'));
+  const budget_goal = budget_goals.find((item) => item.category == category);
+  const updated_budget_goal = document.getElementById(`updated-budget-goal-${category}`).value;
+
+  document.getElementById(`update-goal-${category}`).hidden = false;
+  document.getElementById(`submit-goal-${category}`).hidden = true;
+  document.getElementById(`budget-goal-${category}`).innerHTML = updated_budget_goal;
+
+  if ( budget_goal.budget_goal == null) {
+    fetchData('/transactions/set_budget_goal', 'POST', {
+      user_id: localStorage.getItem('user_id'),
+      category,
+      budget: updated_budget_goal
+    })
+      .then((data) => {
+        alert(data.message);
+        fetchCheckBudget();
+      }).catch(err => {
+        console.error("Error setting budget goal data:", err);
+      })
+  } else {
+    fetchData('/transactions/udpate_budget_goal', 'POST', {
+      user_id: localStorage.getItem('user_id'),
+      category,
+      budget: updated_budget_goal
+    })
+      .then((data) => {
+        alert(data.message);
+        fetchCheckBudget();
+      }).catch(err => {
+        console.error("Error updating budget goal data:", err);
+      })
+  }
+}
+
+function updateBudgetGoalElement(category, budget_goal) {
+  const goal = document.getElementById(`budget-goal-${category}`);
+  goal.innerHTML = `<input id="updated-budget-goal-${category}" type="number" value="${budget_goal ? parseInt(budget_goal) : 0}">`;
+
+  document.getElementById(`update-goal-${category}`).hidden = true;
+  document.getElementById(`submit-goal-${category}`).hidden = false;
+}
+
 // Display budgeting data on the page
 function displayBudgetData(data) {
   const budgetSummary = document.getElementById("budget-summary");
@@ -202,6 +254,36 @@ function displayBudgetSummary(data) {
     `)
     .join('');
   budgetSummary.innerHTML = `${listItems}`;
+}
+
+function displayCheckBudget(data) {
+  const checkBudget = document.getElementById("check-budget-table");
+  if (!checkBudget) {
+    console.error("Check Budget table not found.");
+    return;
+  }
+
+  if (!data || Object.keys(data).length === 0) {
+    checkBudget.innerHTML = "<p>No Budget data available.</p>";
+    return;
+  }
+  
+  localStorage.setItem('budget-goals', JSON.stringify(data));
+  const listItems = Object.values(data)
+    .map((data) => `
+          <tr>
+            <td>${data.category}</td>
+            <td id="budget-goal-${data.category}">$${data.budget_goal ?? ''}</td>
+            <td>$${data.spent}</td>
+            <td>$${data.budget_goal ? data.budget_goal - data.spent : ''}</td>
+            <td>
+              <button id="update-goal-${data.category}" onclick="updateBudgetGoalElement('${data.category}', ${data.budget_goal})">${data.budget_goal ? 'Update' : 'Set'} Goal</button>
+              <button id="submit-goal-${data.category}" onclick="submitBudgetGoal('${data.category}')" class="red-btn" hidden="true">Submit Goal</button>
+            </td>
+          </tr>
+    `)
+    .join('');
+    checkBudget.innerHTML = `${listItems}`;
 }
 
 // Handle user logout
