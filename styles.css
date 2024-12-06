@@ -129,9 +129,9 @@ button:hover {
 
 /* Tables */
 table {
-    width: 100%;
+    width: 80%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 20px auto;
 }
 
 table th, table td {

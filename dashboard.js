@@ -48,6 +48,14 @@ function fetchBudgetData() {
     });
 }
 
+function fetchSummaryData() {
+  fetchData('/transactions/get_budget_summary', 'POST', {'user_id': localStorage.getItem('user_id')})
+    .then(displayBudgetSummary)
+    .catch(error => {
+      console.error("Error fetching budget data:", error);
+    });
+}
+
 function addTransaction() {
   const date = document.getElementById('new-date').value;
   const description = document.getElementById('new-description').value;
@@ -167,6 +175,29 @@ function displayBudgetData(data) {
               <button onclick="editTransaction(${data.id})" id="edit-transaction-${data.id}" hidden="true">Submit</button>
               <button class="red-btn" onclick="removeTransaction(${data.id})">Remove</button>
             </td>
+          </tr>
+    `)
+    .join('');
+  budgetSummary.innerHTML = `${listItems}`;
+}
+
+function displayBudgetSummary(data) {
+  const budgetSummary = document.getElementById("summary-table");
+  if (!budgetSummary) {
+    console.error("Summary table not found.");
+    return;
+  }
+
+  if (!data || Object.keys(data).length === 0) {
+    budgetSummary.innerHTML = "<p>No summary data available.</p>";
+    return;
+  }
+  
+  const listItems = Object.values(data)
+    .map((data) => `
+          <tr>
+            <td>${data.category}</td>
+            <td>${data.amount}</td>
           </tr>
     `)
     .join('');
