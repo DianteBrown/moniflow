@@ -8,11 +8,11 @@
   </head>
   <body>
     <!-- Navigation Bar -->
-    <nav class="navbar">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="twillo.html">Twilio Setup</a>
-      <a href="plaid.html">Plaid Setup</a>
-      <a href="logout.html" id="logoutButton">Logout</a>
+    <nav class="navbar" role="navigation">
+      <a href="dashboard.html" aria-label="Dashboard">Dashboard</a>
+      <a href="twillo.html" aria-label="Twilio Setup">Twilio Setup</a>
+      <a href="plaid.html" aria-label="Plaid Setup">Plaid Setup</a>
+      <a href="#" id="logoutButton" onclick="logoutUser()">Logout</a>
     </nav>
 
     <h1>Welcome to your Dashboard</h1>
@@ -31,44 +31,51 @@
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="budget-summary"></tbody>
+          <tbody id="budget-summary">
+            <!-- Dynamic Data Here -->
+          </tbody>
         </table>
       </div>
     </section>
 
     <div class="button-group">
       <button id="addTransactionBtn">Add a new transaction</button>
-      <!-- <button>View all transactions</button> -->
       <button id="viewSummaryBtn">View spending summary</button>
       <button id="checkBudgetBtn">Check budget</button>
-      <!-- <button>Set or change budgets</button> -->
       <button>Fetch transactions from Plaid</button>
     </div>
 
+    <!-- Add Transaction Modal -->
     <div id="addTransactionModal" class="modal">
       <div class="modal-content">
-        <span class="close" onclick="document.getElementById('addTransactionModal').style.display = 'none'">&times;</span>
+        <span class="close">&times;</span>
         <p>Add a new Transaction</p>
         <div>
-          <div class="input-group"><label>Date:</label><input type="date" id="new-date" /></div>
           <div class="input-group">
-            <label>Description:</label
-            ><input type="text" id="new-description" />
+            <label>Date:</label>
+            <input type="date" id="new-date" />
           </div>
           <div class="input-group">
-            <label>Category:</label><input type="text" id="new-category" />
+            <label>Description:</label>
+            <input type="text" id="new-description" />
           </div>
           <div class="input-group">
-            <label>Amount:</label><input type="number" id="new-amount" />
+            <label>Category:</label>
+            <input type="text" id="new-category" />
+          </div>
+          <div class="input-group">
+            <label>Amount:</label>
+            <input type="number" id="new-amount" />
           </div>
         </div>
         <button onclick="addTransaction()">Submit</button>
       </div>
     </div>
 
+    <!-- View Summary Modal -->
     <div id="viewSummaryModal" class="modal">
       <div class="modal-content">
-        <span class="close" onclick="document.getElementById('viewSummaryModal').style.display = 'none'">&times;</span>
+        <span class="close">&times;</span>
         <h2>Spending Summary</h2>
         <table style="width:100%">
           <thead>
@@ -78,70 +85,114 @@
             </tr>
           </thead>
           <tbody id="summary-table">
+            <!-- Dynamic Data Here -->
           </tbody>
         </table>
       </div>
     </div>
 
+    <!-- Check Budget Modal -->
     <div id="checkBudgetModal" class="modal">
       <div class="modal-content">
-        <span class="close" onclick="document.getElementById('checkBudgetModal').style.display = 'none'">&times;</span>
+        <span class="close">&times;</span>
         <h2>Check Budget Goal</h2>
         <table style="width:100%">
           <thead>
             <tr>
               <th>Category</th>
-              <th style="width: 100px;">Budget Goal</th>
+              <th>Budget Goal</th>
               <th>Spent</th>
-              <th style="max-width: 100px">Remaining /Exceeding</th>
+              <th>Remaining / Exceeding</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="check-budget-table">
+            <!-- Dynamic Data Here -->
           </tbody>
         </table>
       </div>
     </div>
 
     <script>
-      // JavaScript for modal functionality
-      const addTransactionModal = document.getElementById("addTransactionModal");
-      const viewSummaryModal = document.getElementById("viewSummaryModal");
-      const checkBudgetModal = document.getElementById("checkBudgetModal");
-      const openAddTransactionModalButton = document.getElementById("addTransactionBtn");
-      const openViewSummaryModalButton = document.getElementById("viewSummaryBtn");
-      const openCheckBudgetModalButton = document.getElementById("checkBudgetBtn");
-      const closeModalButton = document.querySelector(".close");
+      // Logout Functionality
+      function logoutUser() {
+        fetch('/logout', { method: 'POST' })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = '/login';
+            } else {
+              alert('Logout failed. Please try again.');
+            }
+          })
+          .catch((error) => console.error('Logout error:', error));
+      }
 
-      openAddTransactionModalButton.addEventListener("click", () => {
-        addTransactionModal.style.display = "block";
-      });
-      
-      openViewSummaryModalButton.addEventListener("click", () => {
-        fetchSummaryData();
-        viewSummaryModal.style.display = "block";
-      });
+      // Modal Functionality
+      const modals = document.querySelectorAll(".modal");
+      const closeButtons = document.querySelectorAll(".close");
 
-      openCheckBudgetModalButton.addEventListener("click", () => {
-        fetchCheckBudget();
-        checkBudgetModal.style.display = "block";
-      });
-
-      closeModalButton.addEventListener("click", () => {
-        addTransactionModal.style.display = "none";
-        viewSummaryModal.style.display = "none";
+      // Open Modals
+      document.getElementById("addTransactionBtn").addEventListener("click", () => {
+        document.getElementById("addTransactionModal").style.display = "block";
+        document.getElementById("new-date").focus(); // Set focus
       });
 
-      // Close modal when clicking outside the modal content
+      document.getElementById("viewSummaryBtn").addEventListener("click", () => {
+        fetchSummaryData(); // Fetch data before opening
+        document.getElementById("viewSummaryModal").style.display = "block";
+      });
+
+      document.getElementById("checkBudgetBtn").addEventListener("click", () => {
+        fetchCheckBudget(); // Fetch data before opening
+        document.getElementById("checkBudgetModal").style.display = "block";
+      });
+
+      // Close Modals
+      closeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          button.closest(".modal").style.display = "none";
+        });
+      });
+
       window.addEventListener("click", (event) => {
-        if (event.target === addTransactionModal || event.target === viewSummaryModal) {
-          addTransactionModal.style.display = "none";
-          viewSummaryModal.style.display = "none";
-        }
+        modals.forEach((modal) => {
+          if (event.target === modal) {
+            modal.style.display = "none";
+          }
+        });
       });
-    </script>
 
-    <!-- Link to external JavaScript file -->
+      // Example Functions for Data Fetching
+      function fetchSummaryData() {
+        console.log("Fetching summary data...");
+        // Add API call here
+      }
+
+      function fetchCheckBudget() {
+        console.log("Fetching budget data...");
+        // Add API call here
+      }
+
+      function addTransaction() {
+        if (validateTransactionForm()) {
+          console.log("Adding transaction...");
+          // Add API call here
+        }
+      }
+
+      function validateTransactionForm() {
+        const date = document.getElementById("new-date").value;
+        const description = document.getElementById("new-description").value;
+        const category = document.getElementById("new-category").value;
+        const amount = document.getElementById("new-amount").value;
+
+        if (!date || !description || !category || amount <= 0) {
+          alert("Please fill in all fields correctly.");
+          return false;
+        }
+        return true;
+      }
+    </script>
     <script src="dashboard.js"></script>
   </body>
 </html>
