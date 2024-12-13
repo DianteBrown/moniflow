@@ -24,6 +24,11 @@ a:hover {
     color: #45a049;
 }
 
+a:focus, button:focus {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+}
+
 /* Layout */
 .container {
     max-width: 960px;
@@ -32,6 +37,9 @@ a:hover {
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Navigation Bar */
@@ -78,6 +86,7 @@ form {
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 90%; /* Responsive */
 }
 
 input[type="email"],
@@ -113,7 +122,7 @@ form button:hover {
 
 /* Buttons */
 button {
-    padding: 10px 20px;
+    padding: 12px 20px;
     font-size: 16px;
     background-color: #4CAF50;
     color: #fff;
@@ -121,6 +130,7 @@ button {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin: 10px 5px;
 }
 
 button:hover {
@@ -132,6 +142,8 @@ table {
     width: 80%;
     border-collapse: collapse;
     margin: 20px auto;
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
 table th, table td {
@@ -158,6 +170,11 @@ table tr:nth-child(even) {
     margin: 20px auto;
     max-width: 600px;
     text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
 }
 
 .card h3 {
@@ -179,41 +196,26 @@ footer {
     position: relative;
 }
 
-.text-center {
-    text-align: center;
-}
-
-.button-group {
-    margin-top:20px;
-}
-
-.red-btn {
-    background-color: #F44336;
-}
-.red-btn:hover {
-    background-color: #bb3127;
-}
-
+/* Modal */
 .modal {
-    display: none; /* Hidden by default */
+    display: none;
     position: fixed;
     z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; /* Enable scrolling if needed */
-    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
-/* Modal content box */
 .modal-content {
     background-color: #fff;
-    margin: 15% auto; /* Center the modal */
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%; /* Set modal width */
-    max-width: 500px; /* Optional max width */
+    width: 80%;
+    max-width: 500px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -241,4 +243,75 @@ footer {
 
 .input-group>label {
     min-width: 100px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .container {
+        max-width: 90%;
+        margin: 10px auto;
+        padding: 15px;
+    }
+
+    nav {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    nav a {
+        margin: 0 8px;
+        font-size: 14px;
+        padding: 10px 0;
+    }
+
+    header h1 {
+        font-size: 2rem;
+    }
+
+    table {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    table th, table td {
+        padding: 8px;
+    }
+
+    .card {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+
+    form {
+        width: 90%;
+    }
+
+    input, textarea {
+        font-size: 16px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: #fff;
+        color: #000;
+    }
+
+    .container, .card {
+        box-shadow: none;
+        border: none;
+    }
+
+    nav, footer {
+        display: none;
+    }
 }
