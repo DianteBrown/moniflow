@@ -1,15 +1,37 @@
 const baseURL = "https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Check authentication status
-  fetchData('/check_auth', 'POST')
-    .then(() => {
-      console.log("Authentication successful");
-      fetchBudgetData();
+  // Check if the user is authenticated
+  const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
+  if (!token) {
+    // Redirect to login page if no token is found
+    window.location.href = "login.html";
+  } else {
+    // Validate the token with the backend
+    fetch(`${baseURL}/check_auth`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
     })
-    .catch(() => {
-      window.location.href = "login.html";
-    });
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Token validation failed");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("User is authenticated:", data);
+        // Load dashboard data if authenticated
+        fetchBudgetData();
+      })
+      .catch((error) => {
+        console.error("Authentication error:", error);
+        localStorage.removeItem("token"); // Clear invalid token
+        window.location.href = "login.html"; // Redirect to login page
+      });
+  }
 
   // Set up logout functionality
   const logoutButton = document.getElementById('logoutButton');
@@ -21,12 +43,16 @@ document.addEventListener("DOMContentLoaded", () => {
   setupModalManagement();
 });
 
-// Centralized API Request Handler
+// Centralized Fetch Request Handler
 async function fetchData(endpoint, method = 'GET', body = null) {
   try {
+    const token = localStorage.getItem("token");
     const response = await fetch(`${baseURL}${endpoint}`, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
       body: body ? JSON.stringify(body) : null,
     });
     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
@@ -37,28 +63,27 @@ async function fetchData(endpoint, method = 'GET', body = null) {
   }
 }
 
-// Logout User
+// Logout Function
 function handleLogout() {
   fetch(`${baseURL}/logout`, { method: 'POST' })
     .then((response) => {
       if (response.ok) {
         localStorage.clear();
-        window.location.href = 'login.html';
+        window.location.href = "login.html";
       } else {
-        alert('Logout failed. Please try again.');
+        alert("Logout failed. Please try again.");
       }
     })
-    .catch((error) => console.error('Logout error:', error));
+    .catch((error) => console.error("Logout error:", error));
 }
 
-// Fetch Budget Data
+// Fetch and Display Budget Data
 function fetchBudgetData() {
   fetchData('/transactions/get_budget_data', 'POST', { user_id: localStorage.getItem('user_id') })
     .then(displayBudgetData)
     .catch((error) => console.error("Error fetching budget data:", error));
 }
 
-// Display Budget Data
 function displayBudgetData(data) {
   const budgetSummary = document.getElementById("budget-summary");
   if (!budgetSummary) {
@@ -71,84 +96,21 @@ function displayBudgetData(data) {
     return;
   }
 
-  localStorage.setItem('data', JSON.stringify(data));
-  const rows = Object.values(data).map(renderBudgetRow).join('');
+  const rows = Object.values(data)
+    .map((transaction) => `
+      <tr id="transaction-${transaction.id}">
+        <td>${new Date(transaction.date).toISOString().split('T')[0]}</td>
+        <td>${transaction.description}</td>
+        <td>${transaction.category}</td>
+        <td>${transaction.amount}</td>
+        <td>
+          <button onclick="editTransaction(${transaction.id})">Edit</button>
+          <button class="red-btn" onclick="removeTransaction(${transaction.id})">Remove</button>
+        </td>
+      </tr>
+    `)
+    .join("");
   budgetSummary.innerHTML = rows;
-}
-
-function renderBudgetRow(data) {
-  return `
-    <tr id="transaction-${data.id}">
-      <td>${new Date(data.date).toISOString().split('T')[0]}</td>
-      <td>${data.description}</td>
-      <td>${data.category}</td>
-      <td>${data.amount}</td>
-      <td>
-        <button onclick="showEditButton(${data.id})" id="show-edit-btn-${data.id}">Edit</button>
-        <button onclick="editTransaction(${data.id})" id="edit-transaction-${data.id}" hidden>Submit</button>
-        <button class="red-btn" onclick="removeTransaction(${data.id})">Remove</button>
-      </td>
-    </tr>`;
-}
-
-// Add Transaction
-function addTransaction() {
-  const date = document.getElementById('new-date').value;
-  const description = document.getElementById('new-description').value;
-  const category = document.getElementById('new-category').value;
-  const amount = document.getElementById('new-amount').value;
-
-  if (!date || !description || !category || amount <= 0) {
-    alert("Please fill in all fields correctly.");
-    return;
-  }
-
-  fetchData('/transactions/add_budget_data', 'POST', {
-    user_id: localStorage.getItem('user_id'),
-    date, description, category, amount
-  })
-    .then((data) => {
-      document.getElementById("addTransactionModal").style.display = "none";
-      alert(data.message);
-      fetchBudgetData();
-    })
-    .catch((err) => console.error("Error adding budget data:", err));
-}
-
-// Remove Transaction
-function removeTransaction(id) {
-  fetchData('/transactions/remove_budget_data', 'POST', { user_id: localStorage.getItem('user_id'), transaction_id: id })
-    .then(() => {
-      document.getElementById(`transaction-${id}`).remove();
-      alert("Transaction removed successfully.");
-    })
-    .catch((err) => console.error("Error removing transaction:", err));
-}
-
-// Edit Transaction
-function editTransaction(id) {
-  const date = document.getElementById(`edit-date-${id}`).value;
-  const description = document.getElementById(`edit-description-${id}`).value;
-  const category = document.getElementById(`edit-category-${id}`).value;
-  const amount = document.getElementById(`edit-amount-${id}`).value;
-
-  fetchData('/transactions/edit_budget_data', 'POST', {
-    user_id: localStorage.getItem('user_id'),
-    transaction_id: id, date, description, category, amount
-  })
-    .then(() => {
-      setInnerHTML(id, date, description, category, amount);
-      alert("Transaction updated successfully.");
-    })
-    .catch((err) => console.error("Error editing transaction:", err));
-}
-
-// Helper to Update DOM with Edited Transaction
-function setInnerHTML(id, date, description, category, amount) {
-  document.getElementById(`transaction-date-${id}`).innerHTML = date;
-  document.getElementById(`transaction-description-${id}`).innerHTML = description;
-  document.getElementById(`transaction-category-${id}`).innerHTML = category;
-  document.getElementById(`transaction-amount-${id}`).innerHTML = amount;
 }
 
 // Modal Management
@@ -158,7 +120,7 @@ function setupModalManagement() {
 
   closeButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      toggleModal(button.closest('.modal').id, false);
+      toggleModal(button.closest(".modal").id, false);
     });
   });
 
@@ -168,11 +130,10 @@ function setupModalManagement() {
     });
   });
 
-  document.getElementById("addTransactionBtn").addEventListener("click", () => toggleModal('addTransactionModal', true));
+  document.getElementById("addTransactionBtn").addEventListener("click", () => toggleModal("addTransactionModal", true));
 }
 
-// Toggle Modal Display
 function toggleModal(modalId, show) {
   const modal = document.getElementById(modalId);
-  if (modal) modal.style.display = show ? 'block' : 'none';
+  if (modal) modal.style.display = show ? "block" : "none";
 }
