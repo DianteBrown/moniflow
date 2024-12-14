@@ -4,7 +4,8 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    fetch('https://your-backend-domain/auth/login', {
+    // Update fetch URL to your backend's login endpoint
+    fetch('https://us-east1-plasma-block-441317-m4.cloudfunctions.net/budgetingappfunction/auth/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
