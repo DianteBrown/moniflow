@@ -1,46 +1,54 @@
-# MoniFlow - Simplify Your Finances
+# React + TypeScript + Vite
 
-Welcome to **MoniFlow**, your all-in-one solution for managing finances effortlessly. This project is designed to help users track spending, plan budgets, and reach financial goals with ease.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Overview
+Currently, two official plugins are available:
 
-MoniFlow is a user-friendly financial tool that provides an intuitive interface to manage and monitor your budget. It is currently in its beta phase as a web-based platform, allowing you to:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-- View financial features.
-- Get started with budget tracking.
-- Contact the support team for assistance.
-- Log in or sign up for personalized experiences.
+## Expanding the ESLint configuration
 
-## Pages
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-### Home Page
-- An introduction to MoniFlow and a brief overview of its functionalities.
+```js
+export default tseslint.config({
+  extends: [
+    // Remove ...tseslint.configs.recommended and replace with this
+    ...tseslint.configs.recommendedTypeChecked,
+    // Alternatively, use this for stricter rules
+    ...tseslint.configs.strictTypeChecked,
+    // Optionally, add this for stylistic rules
+    ...tseslint.configs.stylisticTypeChecked,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
 
-### Features Page
-- A detailed description of the key features MoniFlow offers.
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-### Get Started Page
-- Instructions for new users to begin using MoniFlow's services.
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-### Contact Page
-- A form for users to reach out to the support team for inquiries and assistance.
-
-### Login/Signup Page
-- A secure portal for users to create an account or access their existing profiles.
-
-## Getting Started
-
-To explore MoniFlow, visit [moniflow.io](http://moniflow.io/).
-
-## Technologies Used
-
-- **HTML**: For structuring the web pages.
-- **CSS**: For styling and layout.
-- **JavaScript (if applicable)**: For interactive elements (add if used).
-
-## Installation
-
-For local development:
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/moniflow.git
+export default tseslint.config({
+  plugins: {
+    // Add the react-x and react-dom plugins
+    'react-x': reactX,
+    'react-dom': reactDom,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended typescript rules
+    ...reactX.configs['recommended-typescript'].rules,
+    ...reactDom.configs.recommended.rules,
+  },
+})
+```
