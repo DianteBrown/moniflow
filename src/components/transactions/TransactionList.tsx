@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Edit2, Trash2 } from "lucide-react";
 import { Transaction } from "@/services/transactionService";
 import { Category } from "@/services/categoryService";
-import { format } from "date-fns";
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, isWithinInterval } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -48,6 +49,7 @@ export default function TransactionList({
 }: TransactionListProps) {
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [dateFilter, setDateFilter] = useState<'all' | 'week' | 'month' | 'last_month'>('month');
 
   const getCategoryName = (categoryId: string) => {
     const category = categories.find(cat => cat.id === categoryId);
@@ -59,17 +61,54 @@ export default function TransactionList({
     return category?.color || '#6B7280';
   };
 
-  const sortedTransactions = [...transactions].sort((a, b) => {
-    if (sortBy === 'date') {
-      return sortOrder === 'desc' 
-        ? new Date(b.date).getTime() - new Date(a.date).getTime()
-        : new Date(a.date).getTime() - new Date(b.date).getTime();
-    } else {
-      return sortOrder === 'desc' 
-        ? b.amount - a.amount
-        : a.amount - b.amount;
+  const getFilteredTransactions = () => {
+    const now = new Date();
+    let filteredTransactions = [...transactions];
+    
+    // Declare all date variables outside case blocks
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Start from Monday
+    const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+    const monthStart = startOfMonth(now);
+    const monthEnd = endOfMonth(now);
+    const lastMonth = subMonths(now, 1);
+    const lastMonthStart = startOfMonth(lastMonth);
+    const lastMonthEnd = endOfMonth(lastMonth);
+
+    switch (dateFilter) {
+      case 'week':
+        filteredTransactions = transactions.filter(t => 
+          isWithinInterval(new Date(t.date), { start: weekStart, end: weekEnd })
+        );
+        break;
+      case 'month':
+        filteredTransactions = transactions.filter(t => 
+          isWithinInterval(new Date(t.date), { start: monthStart, end: monthEnd })
+        );
+        break;
+      case 'last_month':
+        filteredTransactions = transactions.filter(t => 
+          isWithinInterval(new Date(t.date), { start: lastMonthStart, end: lastMonthEnd })
+        );
+        break;
+      default:
+        // 'all' - no filtering needed
+        break;
     }
-  });
+
+    return filteredTransactions.sort((a, b) => {
+      if (sortBy === 'date') {
+        return sortOrder === 'desc' 
+          ? new Date(b.date).getTime() - new Date(a.date).getTime()
+          : new Date(a.date).getTime() - new Date(b.date).getTime();
+      } else {
+        return sortOrder === 'desc' 
+          ? b.amount - a.amount
+          : a.amount - b.amount;
+      }
+    });
+  };
+
+  const filteredAndSortedTransactions = getFilteredTransactions();
 
   const toggleSort = (field: 'date' | 'amount') => {
     if (sortBy === field) {
@@ -88,6 +127,20 @@ export default function TransactionList({
           <CardDescription>Your latest financial activities</CardDescription>
         </div>
         <div className="flex items-start sm:items-center gap-2 w-full sm:w-auto">
+          <Select
+            value={dateFilter}
+            onValueChange={(value: 'all' | 'week' | 'month' | 'last_month') => setDateFilter(value)}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="week">This Week</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="last_month">Last Month</SelectItem>
+            </SelectContent>
+          </Select>
           <Button
             variant="outline"
             size="sm"
@@ -125,12 +178,16 @@ export default function TransactionList({
               <TransactionSkeleton key={i} />
             ))}
           </div>
-        ) : sortedTransactions.length === 0 ? (
-          <div className="text-center py-4">No transactions found. Add your first transaction!</div>
+        ) : filteredAndSortedTransactions.length === 0 ? (
+          <div className="text-center py-4">
+            {dateFilter === 'all' 
+              ? "No transactions found. Add your first transaction!"
+              : "No transactions found for the selected period."}
+          </div>
         ) : (
           <div className="space-y-4">
             <AnimatePresence mode="sync" initial={false}>
-              {sortedTransactions.map((transaction) => (
+              {filteredAndSortedTransactions.map((transaction) => (
                 <motion.div
                   key={transaction.id}
                   initial={{ opacity: 0, height: 0 }}

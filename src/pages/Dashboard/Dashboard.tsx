@@ -163,7 +163,7 @@ export default function Dashboard() {
           <CardHeader className="flex flex-row items-center justify-between py-2 px-3">
             <div className="flex items-center gap-2">
               <ArrowUpRight className="h-4 w-4 text-green-500" />
-              <CardTitle className="text-sm font-medium">Total Income</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Income</CardTitle>
             </div>
             {loading ? (
               <Skeleton className="h-7 w-24" />
@@ -177,7 +177,7 @@ export default function Dashboard() {
           <CardHeader className="flex flex-row items-center justify-between py-2 px-3">
             <div className="flex items-center gap-2">
               <ArrowDownRight className="h-4 w-4 text-red-500" />
-              <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
             </div>
             {loading ? (
               <Skeleton className="h-7 w-24" />
@@ -191,8 +191,8 @@ export default function Dashboard() {
           <CardHeader className="flex flex-row items-center justify-between py-2 px-3">
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-blue-500" />
-              <CardTitle className="text-sm font-medium">Balance</CardTitle>
-            </div>
+            <CardTitle className="text-sm font-medium">Balance</CardTitle>
+              </div>
             {loading ? (
               <Skeleton className="h-7 w-24" />
             ) : (
@@ -205,9 +205,9 @@ export default function Dashboard() {
       {/* Charts */}
       <div>
         {loading ? (
-          <Card className="border dark:border-gray-800">
+      <Card className="border dark:border-gray-800">
             <CardHeader className="flex flex-row items-center justify-between py-2 px-3">
-              <div>
+          <div>
                 <CardTitle className="text-lg font-medium">Spending Overview</CardTitle>
                 <CardTitle className="text-sm text-muted-foreground">Your spending patterns</CardTitle>
               </div>
@@ -222,7 +222,7 @@ export default function Dashboard() {
             categories={categories}
           />
         )}
-      </div>
+                  </div>
 
       {/* Categories Panel */}
       <CategoryPanel

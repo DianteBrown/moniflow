@@ -117,4 +117,42 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* DayPicker custom styles */
+  .rdp {
+    --rdp-cell-size: 40px;
+    --rdp-caption-font-size: 14px;
+    --rdp-accent-color: var(--accent);
+    --rdp-background-color: var(--background);
+    --rdp-accent-color-dark: var(--accent-foreground);
+    --rdp-background-color-dark: var(--accent);
+    --rdp-outline: var(--ring);
+    --rdp-outline-selected: var(--primary);
+    margin: 0;
+  }
+
+  .rdp-caption {
+    padding: 0 12px;
+  }
+
+  .rdp-head_cell,
+  .rdp-day {
+    width: var(--rdp-cell-size);
+    height: var(--rdp-cell-size);
+    font-size: 14px;
+  }
+
+  .rdp-button:hover:not([disabled]):not(.rdp-day_selected) {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  .rdp-day_selected {
+    background-color: var(--primary) !important;
+    color: var(--primary-foreground) !important;
+  }
+
+  .rdp-day_today {
+    font-weight: bold;
+  }
 }

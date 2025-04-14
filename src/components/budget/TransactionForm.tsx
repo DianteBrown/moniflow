@@ -145,7 +145,12 @@ export default function TransactionForm({
               {formData.date ? format(formData.date, "PPP") : <span>Pick a date</span>}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent 
+            className="p-0" 
+            align="center"
+            side="bottom"
+            sideOffset={5}
+          >
             <Calendar
               mode="single"
               selected={formData.date}
