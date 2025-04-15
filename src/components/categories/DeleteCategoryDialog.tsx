@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Category } from "@/services/categoryService";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 
 interface DeleteCategoryDialogProps {
   isOpen: boolean;
@@ -16,6 +16,7 @@ interface DeleteCategoryDialogProps {
   onConfirm: () => void;
   category: Category;
   isLoading?: boolean;
+  error?: string;
 }
 
 export default function DeleteCategoryDialog({
@@ -24,6 +25,7 @@ export default function DeleteCategoryDialog({
   onConfirm,
   category,
   isLoading = false,
+  error
 }: DeleteCategoryDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -49,6 +51,12 @@ export default function DeleteCategoryDialog({
             {category.is_default && (
               <div className="text-sm text-red-500 mt-2">
                 Note: This is a default category and cannot be deleted.
+              </div>
+            )}
+            {error && (
+              <div className="flex items-start gap-2 p-3 mt-2 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 rounded-lg">
+                <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <span>{error}</span>
               </div>
             )}
           </div>

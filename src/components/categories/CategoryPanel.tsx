@@ -19,6 +19,7 @@ interface ModalState {
   type: 'add' | 'edit' | 'delete' | null;
   category?: Category | null;
   isLoading?: boolean;
+  error?: string;
 }
 
 export default function CategoryPanel({
@@ -83,17 +84,21 @@ export default function CategoryPanel({
     }
     
     try {
-      setModalState(prev => ({ ...prev, isLoading: true }));
+      setModalState(prev => ({ ...prev, isLoading: true, error: undefined }));
       await categoryService.deleteCategory(category.id);
       onCategoriesChange(categories.filter(cat => cat.id !== category.id));
       toast.success("Category deleted successfully");
       closeModal();
-    } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
+    } catch (error: unknown) {
+      // Check for the specific error message
+      const errorMessage = typeof error === 'object' && error !== null
+        ? (error as { response?: { data?: { message?: string } } })?.response?.data?.message
+          || (error as Error)?.message
         : "Failed to delete category";
-      toast.error(errorMessage);
-      console.error("Error deleting category:", error);
+      setModalState(prev => ({ 
+        ...prev, 
+        error: errorMessage
+      }));
     } finally {
       setModalState(prev => ({ ...prev, isLoading: false }));
     }
@@ -244,6 +249,7 @@ export default function CategoryPanel({
           onConfirm={handleDeleteCategory}
           category={modalState.category}
           isLoading={modalState.isLoading}
+          error={modalState.error}
         />
       )}
     </>
