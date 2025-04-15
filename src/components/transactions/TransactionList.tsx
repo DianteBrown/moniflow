@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Edit2, Trash2 } from "lucide-react";
 import { Transaction } from "@/services/transactionService";
 import { Category } from "@/services/categoryService";
-import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subMonths, isWithinInterval } from "date-fns";
+import { format, getMonth, getYear } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -49,7 +49,7 @@ export default function TransactionList({
 }: TransactionListProps) {
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [dateFilter, setDateFilter] = useState<'all' | 'week' | 'month' | 'last_month'>('month');
+  const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
 
   const getCategoryName = (categoryId: string) => {
     const category = categories.find(cat => cat.id === categoryId);
@@ -61,38 +61,47 @@ export default function TransactionList({
     return category?.color || '#6B7280';
   };
 
+  // Get available months and years from transactions
+  const availablePeriods = useMemo(() => {
+    const periods = new Set<string>();
+    
+    // Add each month-year combination from transactions
+    transactions.forEach(transaction => {
+      const date = new Date(transaction.date);
+      const month = getMonth(date);
+      const year = getYear(date);
+      periods.add(`${month}-${year}`);
+    });
+    
+    // Convert to array and sort chronologically
+    const periodsList = Array.from(periods)
+      .map(period => {
+        const [month, year] = period.split('-').map(Number);
+        return {
+          value: period,
+          label: format(new Date(year, month, 1), 'MMMM yyyy'),
+          timestamp: new Date(year, month, 1).getTime()
+        };
+      })
+      .sort((a, b) => b.timestamp - a.timestamp); // Sort newest to oldest
+
+    return [
+      { value: 'all', label: 'All Time' },
+      ...periodsList
+    ];
+  }, [transactions]);
+
   const getFilteredTransactions = () => {
-    const now = new Date();
     let filteredTransactions = [...transactions];
     
-    // Declare all date variables outside case blocks
-    const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Start from Monday
-    const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
-    const monthStart = startOfMonth(now);
-    const monthEnd = endOfMonth(now);
-    const lastMonth = subMonths(now, 1);
-    const lastMonthStart = startOfMonth(lastMonth);
-    const lastMonthEnd = endOfMonth(lastMonth);
-
-    switch (dateFilter) {
-      case 'week':
-        filteredTransactions = transactions.filter(t => 
-          isWithinInterval(new Date(t.date), { start: weekStart, end: weekEnd })
-        );
-        break;
-      case 'month':
-        filteredTransactions = transactions.filter(t => 
-          isWithinInterval(new Date(t.date), { start: monthStart, end: monthEnd })
-        );
-        break;
-      case 'last_month':
-        filteredTransactions = transactions.filter(t => 
-          isWithinInterval(new Date(t.date), { start: lastMonthStart, end: lastMonthEnd })
-        );
-        break;
-      default:
-        // 'all' - no filtering needed
-        break;
+    // Filter by selected month-year (if not 'all')
+    if (selectedPeriod !== 'all') {
+      const [selectedMonth, selectedYear] = selectedPeriod.split('-').map(Number);
+      
+      filteredTransactions = transactions.filter(t => {
+        const date = new Date(t.date);
+        return getMonth(date) === selectedMonth && getYear(date) === selectedYear;
+      });
     }
 
     return filteredTransactions.sort((a, b) => {
@@ -128,17 +137,18 @@ export default function TransactionList({
         </div>
         <div className="flex items-start sm:items-center gap-2 w-full sm:w-auto">
           <Select
-            value={dateFilter}
-            onValueChange={(value: 'all' | 'week' | 'month' | 'last_month') => setDateFilter(value)}
+            value={selectedPeriod}
+            onValueChange={setSelectedPeriod}
           >
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
-              <SelectItem value="week">This Week</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="last_month">Last Month</SelectItem>
+              {availablePeriods.map((period) => (
+                <SelectItem key={period.value} value={period.value}>
+                  {period.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Button
@@ -180,9 +190,10 @@ export default function TransactionList({
           </div>
         ) : filteredAndSortedTransactions.length === 0 ? (
           <div className="text-center py-4">
-            {dateFilter === 'all' 
-              ? "No transactions found. Add your first transaction!"
-              : "No transactions found for the selected period."}
+            {selectedPeriod === 'all' 
+              ? "No transactions found"
+              : `No transactions found for ${availablePeriods.find(p => p.value === selectedPeriod)?.label}`
+            }
           </div>
         ) : (
           <div className="space-y-4">

@@ -7,7 +7,7 @@ import { Category } from "@/services/categoryService";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, parse, isValid } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
 
 interface TransactionFormData {
@@ -42,11 +42,24 @@ export default function TransactionForm({
       date: new Date()
     }
   );
+  const [dateInput, setDateInput] = useState(formData.date ? format(formData.date, "yyyy-MM-dd") : "");
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSubmitting) {
       onSubmit(formData);
+    }
+  };
+
+  const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDateInput(value);
+    
+    // Try to parse the date
+    const parsedDate = parse(value, "yyyy-MM-dd", new Date());
+    if (isValid(parsedDate)) {
+      setFormData({ ...formData, date: parsedDate });
     }
   };
 
@@ -131,35 +144,48 @@ export default function TransactionForm({
 
       <div className="space-y-2">
         <Label>Date</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !formData.date && "text-muted-foreground"
-              )}
-              disabled={isSubmitting}
+        <div className="relative">
+          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+            <div className="flex gap-2">
+              <Input
+                type="date"
+                value={dateInput}
+                onChange={handleDateInputChange}
+                className="w-full"
+                disabled={isSubmitting}
+              />
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn("px-3")}
+                  disabled={isSubmitting}
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+            </div>
+            <PopoverContent 
+              className="p-0" 
+              align="end"
+              side="bottom"
+              sideOffset={5}
             >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {formData.date ? format(formData.date, "PPP") : <span>Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent 
-            className="p-0" 
-            align="center"
-            side="bottom"
-            sideOffset={5}
-          >
-            <Calendar
-              mode="single"
-              selected={formData.date}
-              onSelect={(date) => date && setFormData({ ...formData, date })}
-              initialFocus
-              disabled={isSubmitting}
-            />
-          </PopoverContent>
-        </Popover>
+              <Calendar
+                mode="single"
+                selected={formData.date}
+                onSelect={(date) => {
+                  if (date) {
+                    setFormData({ ...formData, date });
+                    setDateInput(format(date, "yyyy-MM-dd"));
+                    setIsCalendarOpen(false);
+                  }
+                }}
+                initialFocus
+                disabled={isSubmitting}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
       <div className="flex justify-end space-x-2 pt-4">
