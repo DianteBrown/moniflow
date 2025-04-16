@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { authService } from "@/services/authService";
 import { toast } from "sonner";
 import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 
 // Login form as a separate component
 function LoginForm() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +92,15 @@ function LoginForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password-login">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password-login">Password</Label>
+              <Link
+                to="/forgot-password"
+                className="text-sm font-medium text-primary hover:text-primary/80"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <Input
               id="password-login"
               type="password"
@@ -104,6 +114,16 @@ function LoginForm() {
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
+          <div className="mt-4 text-center">
+            <Button
+              variant="ghost"
+              className="text-primary hover:text-primary/80 font-normal text-sm w-full"
+              onClick={() => navigate('/forgot-password')}
+              type="button"
+            >
+              Can't access your account? Reset your password
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>

@@ -3,6 +3,8 @@ import AuthPage from "./pages/Auth/AuthPage";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import MainLayout from "./layouts/MainLayout";
 import { authService } from "./services/authService";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";
 
 function App() {
   const isAuthenticated = authService.isAuthenticated();
@@ -20,6 +22,8 @@ function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/auth" element={!isAuthenticated ? <AuthPage /> : <Navigate to="/dashboard" />} />
+        <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} />
+        <Route path="/reset-password/:token" element={!isAuthenticated ? <ResetPassword /> : <Navigate to="/dashboard" />} />
         
         {/* Protected routes */}
         <Route

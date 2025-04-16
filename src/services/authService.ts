@@ -40,6 +40,21 @@ class AuthService {
     return response.data.user;
   }
 
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>('/password-reset/forgot-password', { email });
+    return response.data;
+  }
+
+  async resetPassword(token: string, password: string): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>(`/password-reset/reset-password/${token}`, { password });
+    return response.data;
+  }
+
+  async verifyResetToken(token: string): Promise<{ message: string }> {
+    const response = await api.get<{ message: string }>(`/password-reset/verify-token/${token}`);
+    return response.data;
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     window.location.href = '/auth';
