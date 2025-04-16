@@ -74,7 +74,15 @@ const Login = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm font-medium text-primary hover:text-primary/80"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 name="password"
@@ -101,6 +109,15 @@ const Login = () => {
               )}
             </Button>
           </form>
+          <div className="mt-4 text-center">
+            <Button
+              variant="ghost"
+              className="text-primary hover:text-primary/80 font-normal text-sm"
+              onClick={() => navigate('/forgot-password')}
+            >
+              Can't access your account? Reset your password
+            </Button>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-sm text-center text-gray-500">
