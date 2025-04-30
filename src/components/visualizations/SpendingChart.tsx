@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Transaction } from "@/services/transactionService";
 import { Category } from "@/services/categoryService";
-import { startOfMonth, endOfMonth, subMonths, format } from "date-fns";
+import { startOfMonth, endOfMonth, subMonths } from "date-fns";
 
 interface SpendingChartProps {
   transactions: Transaction[];
@@ -15,28 +15,12 @@ interface SpendingChartProps {
 type ChartType = 'pie' | 'bar';
 type TimeRange = 'thisMonth' | 'lastMonth' | 'last3Months';
 
-interface MonthData {
-  name: string;
-  [key: string]: string | number; // Allow dynamic category names as properties
-}
-
-interface CategoryChartInfo {
-  name: string;
-  color: string;
-}
-
-interface MonthlyChartData {
-  data: MonthData[];
-  categories: CategoryChartInfo[];
-}
-
-interface PieChartData {
+interface CategoryData {
+  id: string;
   name: string;
   value: number;
   color: string;
 }
-
-type ChartData = PieChartData[] | MonthlyChartData;
 
 export default function SpendingChart({ transactions, categories }: SpendingChartProps) {
   const [chartType, setChartType] = useState<ChartType>('pie');
@@ -71,71 +55,38 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
     });
   };
 
-  const getCategoryData = () => {
+  const getCategoryData = (): CategoryData[] => {
     const filteredTransactions = filterTransactions();
     const categoryTotals = new Map<string, number>();
 
+    // Calculate totals for each category
     filteredTransactions.forEach(transaction => {
       const current = categoryTotals.get(transaction.category_id) || 0;
       categoryTotals.set(transaction.category_id, current + transaction.amount);
     });
 
-    return Array.from(categoryTotals.entries()).map(([categoryId, total]) => {
-      const category = categories.find(c => c.id === categoryId);
-      return {
-        name: category?.name || 'Unknown',
-        value: total,
-        color: category?.color || '#6B7280'
-      };
-    }).sort((a, b) => b.value - a.value);
+    // Convert to array and add category info
+    return Array.from(categoryTotals.entries())
+      .map(([categoryId, total]) => {
+        const category = categories.find(c => c.id === categoryId);
+        return {
+          id: categoryId,
+          name: category?.name || 'Unknown',
+          value: total,
+          color: category?.color || '#6B7280'
+        };
+      })
+      .filter(item => item.value > 0) // Only include categories with values > 0
+      .sort((a, b) => b.value - a.value); // Sort by value descending
   };
 
-  const getMonthlyData = () => {
-    const now = new Date();
-    const months = timeRange === 'last3Months' ? 3 : 
-                  timeRange === 'lastMonth' ? 2 : 1;
-    const monthlyData = [];
-
-    for (let i = 0; i < months; i++) {
-      const month = subMonths(now, i);
-      const start = startOfMonth(month);
-      const end = endOfMonth(month);
-      
-      const monthTransactions = transactions.filter(t => {
-        const date = new Date(t.date);
-        return date >= start && date <= end && t.type === 'expense';
-      });
-
-      // Group transactions by category
-      const categoryTotals = new Map<string, number>();
-      monthTransactions.forEach(transaction => {
-        const current = categoryTotals.get(transaction.category_id) || 0;
-        categoryTotals.set(transaction.category_id, current + transaction.amount);
-      });
-
-      const monthData: MonthData = {
-        name: format(month, 'MMM yyyy'),
-      };
-
-      // Add each category's total to the month data
-      categories.forEach(category => {
-        const total = categoryTotals.get(category.id) || 0;
-        monthData[category.name] = total;
-      });
-
-      monthlyData.unshift(monthData);
-    }
-
-    return {
-      data: monthlyData,
-      categories: categories.map(cat => ({
-        name: cat.name,
-        color: cat.color || '#6B7280'
-      }))
-    };
+  // Get the total expenses for the selected time period
+  const getTotalExpenses = () => {
+    return filterTransactions().reduce((sum, t) => sum + t.amount, 0);
   };
 
-  const chartData: ChartData = chartType === 'pie' ? getCategoryData() : getMonthlyData();
+  const chartData = getCategoryData();
+  const totalExpenses = getTotalExpenses();
 
   return (
     <Card className="border dark:border-gray-800">
@@ -143,7 +94,7 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
         <div>
           <CardTitle>Spending Analysis</CardTitle>
           <CardDescription>
-            Total expenses: ${filterTransactions().reduce((sum, t) => sum + t.amount, 0).toFixed(2)}
+            Total expenses: ${totalExpenses.toFixed(2)}
           </CardDescription>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
@@ -168,7 +119,7 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
       </CardHeader>
       <CardContent>
         <div className="h-[400px]">
-          {filterTransactions().length === 0 ? (
+          {chartData.length === 0 ? (
             <div className="h-full flex items-center justify-center">
               <div className="text-center text-muted-foreground">
                 <p className="text-lg mb-1">No transactions found</p>
@@ -180,7 +131,7 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
               {chartType === 'pie' ? (
                 <PieChart>
                   <Pie
-                    data={chartData as PieChartData[]}
+                    data={chartData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -191,7 +142,7 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
                       `${name} (${(percent * 100).toFixed(0)}%)`
                     }
                   >
-                    {(chartData as PieChartData[]).map((entry, index) => (
+                    {chartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -201,24 +152,34 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
                   <Legend />
                 </PieChart>
               ) : (
-                <BarChart data={(chartData as MonthlyChartData).data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <BarChart 
+                  data={chartData} 
+                  layout="vertical"
+                  margin={{ top: 20, right: 30, left: 75, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
+                  <XAxis 
+                    type="number" 
+                    tickFormatter={(value) => `$${value}`} 
+                  />
                   <YAxis 
-                    tickFormatter={(value) => `$${value}`}
+                    type="category" 
+                    dataKey="name" 
+                    width={70}
                   />
                   <Tooltip 
-                    formatter={(value: number, name: string) => [`$${value.toFixed(2)}`, name]}
+                    formatter={(value: number) => [`$${value.toFixed(2)}`]}
                   />
                   <Legend />
-                  {(chartData as MonthlyChartData).categories.map((category) => (
-                    <Bar 
-                      key={category.name}
-                      dataKey={category.name}
-                      stackId="a"
-                      fill={category.color}
-                    />
-                  ))}
+                  <Bar 
+                    dataKey="value" 
+                    name="Amount" 
+                    isAnimationActive={true}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
                 </BarChart>
               )}
             </ResponsiveContainer>

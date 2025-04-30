@@ -5,7 +5,7 @@
   "type": "module",
   "homepage": "https://github.com/DianteBrown/moniflow.git",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host=127.0.0.1",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -13,6 +13,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.7",
     "@radix-ui/react-label": "^2.1.3",
     "@radix-ui/react-popover": "^1.1.7",

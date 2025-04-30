@@ -10,6 +10,7 @@ import {
 import { authService } from "@/services/authService";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import SubscriptionBadge from "@/components/subscription/SubscriptionBadge";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -66,6 +67,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               ))}
 
               <div className="flex items-center space-x-2 border-l pl-4 ml-2">
+                <SubscriptionBadge />
                 <ThemeToggle />
                 <Button 
                   variant="ghost" 
@@ -81,6 +83,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
             {/* Mobile Right Section */}
             <div className="md:hidden flex items-center space-x-2">
+              <SubscriptionBadge />
               <ThemeToggle />
               <Button
                 variant="ghost"
