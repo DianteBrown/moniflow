@@ -12,6 +12,7 @@ import CategoryPanel from "@/components/categories/CategoryPanel";
 import { AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import DeleteTransactionDialog from "@/components/transactions/DeleteTransactionDialog";
+import TransactionImportExport from "@/components/transactions/TransactionImportExport";
 
 export default function Dashboard() {
   // Transaction state
@@ -45,12 +46,20 @@ export default function Dashboard() {
     try {
       const [transactionsData, summaryData, categoriesData] = await Promise.all([
         transactionService.getTransactions(),
-        transactionService.getTransactionSummary(),
+        transactionService.getTransactionSummary('all_time'),
         categoryService.getCategories()
       ]);
       
       setTransactions(transactionsData);
-      setSummary(summaryData);
+      setSummary({
+        totalIncome: summaryData?.totalIncome ?? 0,
+        totalExpense: summaryData?.totalExpense ?? 0,
+        balance: summaryData?.balance ?? 0,
+        period: {
+          start: summaryData?.period?.start ?? "",
+          end: summaryData?.period?.end ?? ""
+        }
+      });
       setCategories(categoriesData);
     } catch (error) {
       toast.error("Failed to load dashboard data");
@@ -232,18 +241,27 @@ export default function Dashboard() {
         onCategoriesChange={setCategories}
       />
 
-      {/* Transactions List with AnimatePresence */}
-      <AnimatePresence mode="sync">
-        <TransactionList
-          transactions={transactions}
-          categories={categories}
-          loading={loading}
-          isRefreshing={isRefreshing}
-          onAddClick={() => setIsAddModalOpen(true)}
-          onEditClick={handleEditClick}
-          onDeleteClick={(transaction) => setTransactionToDelete(transaction)}
-        />
-      </AnimatePresence>
+      {/* Transactions List with Import/Export */}
+      <div className="flex flex-col space-y-4">
+        <div className="flex justify-end">
+          <TransactionImportExport
+            transactions={transactions}
+            categories={categories}
+            onImportComplete={fetchDashboardData}
+          />
+        </div>
+        <AnimatePresence mode="sync">
+          <TransactionList
+            transactions={transactions}
+            categories={categories}
+            loading={loading}
+            isRefreshing={isRefreshing}
+            onAddClick={() => setIsAddModalOpen(true)}
+            onEditClick={handleEditClick}
+            onDeleteClick={(transaction) => setTransactionToDelete(transaction)}
+          />
+        </AnimatePresence>
+      </div>
 
       {/* Add Transaction Modal */}
       {isAddModalOpen && (
