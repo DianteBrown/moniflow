@@ -6,6 +6,7 @@ export interface Category {
   color: string;
   icon: string;
   is_default: boolean;
+  type: 'income' | 'expense' | 'both';
   user_id?: string;
   created_at?: string;
   updated_at?: string;

@@ -5,15 +5,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Transaction } from "@/services/transactionService";
 import { Category } from "@/services/categoryService";
-import { startOfMonth, endOfMonth, subMonths } from "date-fns";
+import { getMonth, getYear } from "date-fns";
 
 interface SpendingChartProps {
   transactions: Transaction[];
   categories: Category[];
+  selectedPeriod: string;
+  onPeriodChange: (period: string) => void;
+  availablePeriods: { value: string; label: string }[];
 }
 
 type ChartType = 'pie' | 'bar';
-type TimeRange = 'thisMonth' | 'lastMonth' | 'last3Months';
 
 interface CategoryData {
   id: string;
@@ -22,36 +24,26 @@ interface CategoryData {
   color: string;
 }
 
-export default function SpendingChart({ transactions, categories }: SpendingChartProps) {
+export default function SpendingChart({ 
+  transactions, 
+  categories,
+  selectedPeriod,
+  onPeriodChange,
+  availablePeriods
+}: SpendingChartProps) {
   const [chartType, setChartType] = useState<ChartType>('pie');
-  const [timeRange, setTimeRange] = useState<TimeRange>('thisMonth');
-
-  const getDateRange = () => {
-    const now = new Date();
-    switch (timeRange) {
-      case 'thisMonth':
-        return {
-          start: startOfMonth(now),
-          end: endOfMonth(now)
-        };
-      case 'lastMonth':
-        return {
-          start: startOfMonth(subMonths(now, 1)),
-          end: endOfMonth(subMonths(now, 1))
-        };
-      case 'last3Months':
-        return {
-          start: startOfMonth(subMonths(now, 2)),
-          end: endOfMonth(now)
-        };
-    }
-  };
 
   const filterTransactions = () => {
-    const { start, end } = getDateRange();
+    if (selectedPeriod === 'all') {
+      return transactions.filter(t => t.type === 'expense');
+    }
+
+    const [selectedMonth, selectedYear] = selectedPeriod.split('-').map(Number);
     return transactions.filter(t => {
       const date = new Date(t.date);
-      return date >= start && date <= end && t.type === 'expense';
+      return getMonth(date) === selectedMonth && 
+             getYear(date) === selectedYear && 
+             t.type === 'expense';
     });
   };
 
@@ -98,14 +90,16 @@ export default function SpendingChart({ transactions, categories }: SpendingChar
           </CardDescription>
         </div>
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-          <Select value={timeRange} onValueChange={(value: TimeRange) => setTimeRange(value)}>
-            <SelectTrigger className="w-full sm:w-[140px]">
-              <SelectValue placeholder="Select time range" />
+          <Select value={selectedPeriod} onValueChange={onPeriodChange}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Select period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="thisMonth">This Month</SelectItem>
-              <SelectItem value="lastMonth">Last Month</SelectItem>
-              <SelectItem value="last3Months">Last 3 Months</SelectItem>
+              {availablePeriods.map((period) => (
+                <SelectItem key={period.value} value={period.value}>
+                  {period.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Button

@@ -1,5 +1,12 @@
+/* Font imports first */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Sora:wght@400;600;700&display=swap');
+
+/* Then CSS frameworks */
 @import "tailwindcss";
 @import "tw-animate-css";
+
+/* Then component styles */
+@import "./pages/Landing/landing-page.css";
 
 @custom-variant dark (&:is(.dark *));
 
