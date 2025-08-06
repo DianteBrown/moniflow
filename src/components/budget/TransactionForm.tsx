@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { format, parse, isValid } from "date-fns";
 import { CalendarIcon, Loader2 } from "lucide-react";
+import { CategoryIconComponent } from "@/components/icons/CategoryIcons";
 
 interface TransactionFormData {
   amount: string;
@@ -63,6 +64,11 @@ export default function TransactionForm({
     }
   };
 
+  // Filter categories by type
+  const filteredCategories = (categories || []).filter(
+    (cat) => cat.type === formData.type || cat.type === 'both'
+  );
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
@@ -105,30 +111,27 @@ export default function TransactionForm({
 
       <div className="space-y-2">
         <Label htmlFor="category">Category</Label>
-        <Select
-          value={formData.category}
-          onValueChange={(value: string) => 
-            setFormData({ ...formData, category: value })
-          }
-          disabled={isSubmitting}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-          <SelectContent>
-            {(categories || []).map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-2 h-2 rounded-full" 
-                    style={{ backgroundColor: category.color || "#0047AB" }} 
-                  />
-                  {category.name}
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-48 overflow-y-auto p-1 rounded-md border bg-muted/30">
+          {filteredCategories.length === 0 && (
+            <span className="text-muted-foreground text-sm col-span-3 sm:col-span-4">No categories available</span>
+          )}
+          {filteredCategories.map((category) => (
+            <button
+              type="button"
+              key={category.id}
+              className={`flex flex-col items-center p-2 rounded-md border transition-colors focus:outline-none ${
+                formData.category === category.id
+                  ? "border-primary bg-primary/10"
+                  : "border-muted hover:bg-muted"
+              }`}
+              onClick={() => setFormData({ ...formData, category: category.id })}
+              disabled={isSubmitting}
+            >
+              <CategoryIconComponent iconId={category.icon || "shopping-cart"} size={28} style={{ color: category.color || "#0047AB" }} />
+              <span className="text-xs mt-1 text-center truncate w-16">{category.name}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-2">

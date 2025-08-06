@@ -14,7 +14,6 @@ const PricingPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processingPlanId, setProcessingPlanId] = useState<string | null>(null);
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   
   const { subscriptionStatus, refreshSubscription } = useSubscription();
@@ -221,7 +220,7 @@ const PricingPage = () => {
         </Card>
       )}
 
-      <Tabs defaultValue="monthly" className="mb-8" onValueChange={(v) => setBillingPeriod(v as 'monthly' | 'yearly')}>
+      <Tabs defaultValue="monthly" className="mb-8">
         <div className="flex justify-center mb-8">
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="monthly">Monthly</TabsTrigger>
@@ -251,25 +250,25 @@ const PricingPage = () => {
                     <div className="bg-primary text-primary-foreground py-1 px-8 rotate-45 transform origin-bottom-right text-xs font-medium">
                       Current
                     </div>
-        </div>
-      )}
+                  </div>
+                )}
 
                 <CardHeader>
                   <CardTitle>{plan.name}</CardTitle>
                   <CardDescription>
                     {plan.name === 'Free' ? 'For casual users' : 'Premium experience'}
                   </CardDescription>
-              {plan.price > 0 ? (
+                  {plan.price > 0 ? (
                     <div className="mt-4">
-                  <span className="text-3xl font-bold">${plan.price}</span>
+                      <span className="text-3xl font-bold">${plan.price}</span>
                       <span className="text-muted-foreground">/{plan.billing_cycle}</span>
-                </div>
-              ) : (
+                    </div>
+                  ) : (
                     <div className="mt-4">
                       <span className="text-3xl font-bold">$0</span>
                       <span className="text-muted-foreground">/forever</span>
-                </div>
-              )}
+                    </div>
+                  )}
                 </CardHeader>
                 
                 <CardContent>
@@ -356,21 +355,21 @@ const PricingPage = () => {
                   <Button 
                     className="w-full"
                     variant={plan.price > 0 ? "default" : "outline"}
-                disabled={processingPlanId === plan.id || 
-                         (subscriptionStatus?.hasActiveSubscription && 
-                          subscriptionStatus.subscription.plan.id === plan.id)}
+                    disabled={processingPlanId === plan.id || 
+                             (subscriptionStatus?.hasActiveSubscription && 
+                              subscriptionStatus.subscription.plan.id === plan.id)}
                     onClick={() => handleSubscribe(plan)}
-              >
-                {processingPlanId === plan.id ? (
+                  >
+                    {processingPlanId === plan.id ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
+                        Processing...
                       </>
-                ) : subscriptionStatus?.hasActiveSubscription && subscriptionStatus.subscription.plan.id === plan.id ? (
-                  'Current Plan'
-                ) : plan.price === 0 ? (
-                  'Free Plan'
-                ) : (
+                    ) : subscriptionStatus?.hasActiveSubscription && subscriptionStatus.subscription.plan.id === plan.id ? (
+                      'Current Plan'
+                    ) : plan.price === 0 ? (
+                      'Free Plan'
+                    ) : (
                       <>
                         <CreditCard className="mr-2 h-4 w-4" />
                         Subscribe

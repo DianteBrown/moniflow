@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Edit2, Trash2 } from "lucide-react";
@@ -8,6 +8,7 @@ import { format, getMonth, getYear } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CategoryIconComponent } from "@/components/icons/CategoryIcons";
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -17,6 +18,9 @@ interface TransactionListProps {
   onAddClick: () => void;
   onEditClick: (transaction: Transaction) => void;
   onDeleteClick: (transaction: Transaction) => void;
+  selectedPeriod: string;
+  onPeriodChange: (period: string) => void;
+  availablePeriods: { value: string; label: string }[];
 }
 
 const TransactionSkeleton = () => (
@@ -45,11 +49,13 @@ export default function TransactionList({
   isRefreshing = false,
   onAddClick,
   onEditClick,
-  onDeleteClick
+  onDeleteClick,
+  selectedPeriod,
+  onPeriodChange,
+  availablePeriods
 }: TransactionListProps) {
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
 
   const getCategoryName = (categoryId: string) => {
     const category = categories.find(cat => cat.id === categoryId);
@@ -61,35 +67,10 @@ export default function TransactionList({
     return category?.color || '#6B7280';
   };
 
-  // Get available months and years from transactions
-  const availablePeriods = useMemo(() => {
-    const periods = new Set<string>();
-    
-    // Add each month-year combination from transactions
-    transactions.forEach(transaction => {
-      const date = new Date(transaction.date);
-      const month = getMonth(date);
-      const year = getYear(date);
-      periods.add(`${month}-${year}`);
-    });
-    
-    // Convert to array and sort chronologically
-    const periodsList = Array.from(periods)
-      .map(period => {
-        const [month, year] = period.split('-').map(Number);
-        return {
-          value: period,
-          label: format(new Date(year, month, 1), 'MMMM yyyy'),
-          timestamp: new Date(year, month, 1).getTime()
-        };
-      })
-      .sort((a, b) => b.timestamp - a.timestamp); // Sort newest to oldest
-
-    return [
-      { value: 'all', label: 'All Time' },
-      ...periodsList
-    ];
-  }, [transactions]);
+  const getCategoryIcon = (categoryId: string) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category?.icon || 'shopping-cart';
+  };
 
   const getFilteredTransactions = () => {
     let filteredTransactions = [...transactions];
@@ -138,7 +119,7 @@ export default function TransactionList({
         <div className="flex items-start sm:items-center gap-2 w-full sm:w-auto">
           <Select
             value={selectedPeriod}
-            onValueChange={setSelectedPeriod}
+            onValueChange={onPeriodChange}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select period" />
@@ -209,9 +190,11 @@ export default function TransactionList({
                   style={{ overflow: "hidden" }}
                 >
                   <div className="flex items-start gap-3">
-                    <div 
-                      className="w-3 h-3 rounded-full mt-1.5" 
-                      style={{ backgroundColor: getCategoryColor(transaction.category_id) }} 
+                    <CategoryIconComponent
+                      iconId={getCategoryIcon(transaction.category_id)}
+                      size={20}
+                      className="mt-1.5 flex-shrink-0"
+                      style={{ color: getCategoryColor(transaction.category_id) }}
                     />
                     <div>
                       <p className="font-medium">{transaction.description}</p>

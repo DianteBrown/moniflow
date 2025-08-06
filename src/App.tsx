@@ -8,6 +8,7 @@ import ResetPassword from "./pages/Auth/ResetPassword";
 import PricingPage from "./pages/subscription/PricingPage";
 import ManageSubscription from "./pages/subscription/ManageSubscription";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
+import LandingPage from "./pages/Landing/LandingPage";
 
 function App() {
   const isAuthenticated = authService.isAuthenticated();
@@ -24,6 +25,9 @@ function App() {
     <Router>
       <SubscriptionProvider>
         <Routes>
+          {/* Landing page route */}
+          <Route path="/" element={<LandingPage />} />
+          
           {/* Public routes */}
           <Route path="/auth" element={!isAuthenticated ? <AuthPage /> : <Navigate to="/dashboard" />} />
           <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} />
@@ -57,11 +61,8 @@ function App() {
             }
           />
           
-          {/* Redirect root to dashboard or login */}
-          <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/auth"} />} />
-          
-          {/* Catch all route - redirect to auth or dashboard */}
-          <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/auth"} />} />
+          {/* Catch all route - redirect to home */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </SubscriptionProvider>
     </Router>

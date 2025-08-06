@@ -1,15 +1,14 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import TransactionForm from "@/components/budget/TransactionForm";
 import { useState } from "react";
-import { transactionService, Transaction, CreateTransactionData } from "@/services/transactionService";
-import { toast } from "sonner";
+import { CreateTransactionData } from "@/services/transactionService";
 import { format } from "date-fns";
 import { Category } from "@/services/categoryService";
 
 interface AddTransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddTransaction: (transaction: Transaction) => void;
+  onAddTransaction: (transactionData: CreateTransactionData) => void;
   categories: Category[];
 }
 
@@ -38,13 +37,12 @@ const AddTransactionModal = ({ isOpen, onClose, onAddTransaction, categories }: 
         type: formData.type
       };
       
-      const transaction = await transactionService.createTransaction(transactionData);
-      onAddTransaction(transaction);
-      toast.success("Transaction added successfully");
+      // Pass the data to the parent component for processing
+      onAddTransaction(transactionData);
+      // Close the modal - the parent component will handle success/error toasts
       onClose();
     } catch (error) {
-      console.error("Error adding transaction:", error);
-      toast.error("Failed to add transaction");
+      console.error("Error preparing transaction data:", error);
     } finally {
       setIsSubmitting(false);
     }
