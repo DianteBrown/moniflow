@@ -56,8 +56,8 @@ const Footer = () => {
 
             <div className="footer-links-column">
               <h3 className="footer-links-title">Utilities</h3>
-              <a href="#" className="footer-link">Privacy Policy</a>
-              <a href="#" className="footer-link">Terms</a>
+              <a href="/privacy" className="footer-link">Privacy Policy</a>
+              <a href="/terms" className="footer-link">Terms</a>
               <a href="#" className="footer-link">Cookies</a>
               <a href="#" className="footer-link">Licenses</a>
             </div>

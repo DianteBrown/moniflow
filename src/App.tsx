@@ -9,6 +9,9 @@ import PricingPage from "./pages/subscription/PricingPage";
 import ManageSubscription from "./pages/subscription/ManageSubscription";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import LandingPage from "./pages/Landing/LandingPage";
+import DarkLandingPage from "./pages/Landing/DarkLandingPage";
+import PrivacyPage from "./pages/Privacy/PrivacyPage";
+import TermsPage from "./pages/Terms/TermsPage";
 
 function App() {
   const isAuthenticated = authService.isAuthenticated();
@@ -32,7 +35,8 @@ function App() {
           <Route path="/auth" element={!isAuthenticated ? <AuthPage /> : <Navigate to="/dashboard" />} />
           <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} />
           <Route path="/reset-password/:token" element={!isAuthenticated ? <ResetPassword /> : <Navigate to="/dashboard" />} />
-          
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
           {/* Protected routes */}
           <Route
             path="/dashboard"
