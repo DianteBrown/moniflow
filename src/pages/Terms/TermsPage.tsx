@@ -113,7 +113,7 @@ const TermsPage = () => {
                         If you have any questions about these Terms of Service, please contact us at:
                     </p>
                     <div className="bg-background p-4 rounded-lg">
-                        <p><strong>Email:</strong> legal@moniflow.com</p>
+                        <p><strong>Email:</strong> diantebrown@jag-tek.com</p>
                         <p><strong>Address:</strong> Moniflow Legal Department</p>
                     </div>
                 </section>

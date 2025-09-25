@@ -165,9 +165,8 @@ const PrivacyPage = () => {
             If you have any questions about this Privacy Policy or our privacy practices, please contact us:
           </p>
           <div className="bg-background p-4 rounded-lg">
-            <p><strong>Email:</strong> privacy@moniflow.com</p>
+            <p><strong>Email:</strong> diantebrown@jag-tek.com</p>
             <p><strong>Address:</strong> Moniflow Privacy Department</p>
-            <p><strong>Data Protection Officer:</strong> dpo@moniflow.com</p>
           </div>
         </section>
       </div>
