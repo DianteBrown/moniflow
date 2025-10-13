@@ -25,18 +25,18 @@ function LoginForm() {
 
     try {
       const response = await authService.login({ email, password });
-      
+
       // Log the response and token
       console.log('Login response:', response);
       console.log('Token after login:', localStorage.getItem('token'));
-      
+
       // Successfully logged in and token stored
       toast.success('Login successful!');
-      
+
       // Force token storage
       if (response && response.token) {
         localStorage.setItem('token', response.token);
-        
+
         // Add a delay before navigation to ensure the toast is seen and token is stored
         setTimeout(() => {
           console.log('Navigating to dashboard with token:', localStorage.getItem('token'));
@@ -47,7 +47,7 @@ function LoginForm() {
       }
     } catch (error: unknown) {
       console.error('Login error:', error);
-      
+
       // Direct error handling approach
       if (axios.isAxiosError(error)) {
         // Set the error message directly in the UI
@@ -70,49 +70,49 @@ function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-        {errorMessage && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-md">
-            <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
-          </div>
-        )}
-          <div className="space-y-2">
-            <Label htmlFor="email-login">Email</Label>
-            <Input
-              id="email-login"
-              type="email"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="dark:text-foreground"
-            />
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password-login">Password</Label>
-              <Link
-                to="/forgot-password"
-                className="text-sm font-medium text-primary hover:text-primary/80 dark:text-primary dark:hover:text-primary/80"
-              >
-                Forgot password?
-              </Link>
-            </div>
-            <Input
-              id="password-login"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className="dark:text-foreground"
-            />
-          </div>
+      {errorMessage && (
+        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-md">
+          <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
+        </div>
+      )}
+      <div className="space-y-2">
+        <Label htmlFor="email-login">Email</Label>
+        <Input
+          id="email-login"
+          type="email"
+          placeholder="name@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          className="dark:text-foreground"
+        />
+      </div>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password-login">Password</Label>
+          <Link
+            to="/forgot-password"
+            className="text-sm font-medium text-primary hover:text-primary/80 dark:text-primary dark:hover:text-primary/80"
+          >
+            Forgot password?
+          </Link>
+        </div>
+        <Input
+          id="password-login"
+          type="password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+          className="dark:text-foreground"
+        />
+      </div>
       <Button type="submit" className="w-full bg-[#184A47] hover:bg-[#123a38]" disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign in'}
-          </Button>
-        </form>
+        {isLoading ? 'Signing in...' : 'Sign in'}
+      </Button>
+    </form>
   );
 }
 
@@ -142,18 +142,18 @@ function RegisterForm() {
         email,
         password,
       });
-      
+
       // Log the response and token
       console.log('Registration response:', response);
       console.log('Token after registration:', localStorage.getItem('token'));
-      
+
       // Force token storage
       if (response && response.token) {
         localStorage.setItem('token', response.token);
-        
+
         // Successfully registered and token stored
         toast.success('Registration successful!');
-        
+
         // Add a delay before navigation to ensure the toast is seen and token is stored
         setTimeout(() => {
           console.log('Navigating to dashboard with token:', localStorage.getItem('token'));
@@ -164,7 +164,7 @@ function RegisterForm() {
       }
     } catch (error: unknown) {
       console.error('Registration error:', error);
-      
+
       // Direct error handling approach
       if (axios.isAxiosError(error)) {
         // Set the error message directly in the UI
@@ -185,66 +185,66 @@ function RegisterForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-        {errorMessage && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-md">
-            <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
-          </div>
-        )}
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="John Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="dark:text-foreground"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email-register">Email</Label>
-            <Input
-              id="email-register"
-              type="email"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="dark:text-foreground"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password-register">Password</Label>
-            <Input
-              id="password-register"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="new-password"
-              className="dark:text-foreground"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirm Password</Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              autoComplete="new-password"
-              className="dark:text-foreground"
-            />
-          </div>
+      {errorMessage && (
+        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-md">
+          <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
+        </div>
+      )}
+      <div className="space-y-2">
+        <Label htmlFor="name">Full Name</Label>
+        <Input
+          id="name"
+          type="text"
+          placeholder="John Doe"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          className="dark:text-foreground"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="email-register">Email</Label>
+        <Input
+          id="email-register"
+          type="email"
+          placeholder="name@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          className="dark:text-foreground"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="password-register">Password</Label>
+        <Input
+          id="password-register"
+          type="password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+          className="dark:text-foreground"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="confirm-password">Confirm Password</Label>
+        <Input
+          id="confirm-password"
+          type="password"
+          placeholder="••••••••"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+          className="dark:text-foreground"
+        />
+      </div>
       <Button type="submit" className="w-full bg-[#184A47] hover:bg-[#123a38]" disabled={isLoading}>
-            {isLoading ? 'Creating account...' : 'Create account'}
-          </Button>
-        </form>
+        {isLoading ? 'Creating account...' : 'Create account'}
+      </Button>
+    </form>
   );
 }
 
@@ -280,7 +280,7 @@ const AuthPage = () => {
             {/* Left side - Hero text */}
             <div className="flex flex-col justify-center p-6">
               <h1 className="text-4xl font-bold text-[#184A47] dark:text-white mb-4 font-montserrat">
-                {activeView === "login" 
+                {activeView === "login"
                   ? "Welcome back!"
                   : "Start your financial journey"
                 }
@@ -291,16 +291,16 @@ const AuthPage = () => {
                   : "Create an account to start tracking your expenses, setting budgets, and achieving your financial goals."
                 }
               </p>
-              
+
               {/* Benefits section instead of screenshot */}
               <div className="bg-white/80 dark:bg-gray-800 rounded-xl p-6 border border-[#184A47]/10 dark:border-gray-700 shadow-md">
                 <h3 className="text-xl font-semibold text-[#184A47] dark:text-white mb-4 font-montserrat">
-                  {activeView === "login" 
+                  {activeView === "login"
                     ? "Your financial dashboard awaits"
                     : "Join thousands already saving money"
                   }
                 </h3>
-                
+
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-start">
                     <svg className="h-6 w-6 text-[#184A47] dark:text-green-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -327,13 +327,13 @@ const AuthPage = () => {
                     <span className="text-gray-700 dark:text-gray-300">Set and achieve your financial goals</span>
                   </li>
                 </ul>
-                
+
                 {/* Trust indicator */}
                 <div className="flex items-center border-t border-gray-200 dark:border-gray-700 pt-4">
-                  <img 
-                    src="/assets/images/trusted-users.png" 
-                    alt="Trusted Users" 
-                    className="w-24 h-8 mr-3" 
+                  <img
+                    src="/assets/images/trusted-users.png"
+                    alt="Trusted Users"
+                    className="w-24 h-8 mr-3"
                   />
                   <div>
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Trusted by 30,000+ users worldwide</p>
@@ -348,53 +348,51 @@ const AuthPage = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Right side - Authentication form */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
               {/* Mobile tab switcher */}
               <div className="mb-6 flex border dark:border-gray-700 rounded-lg overflow-hidden">
                 <button
-                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
-                    activeView === 'login' 
-                      ? 'bg-[#184A47] text-white' 
+                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${activeView === 'login'
+                      ? 'bg-[#184A47] text-white'
                       : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
+                    }`}
                   onClick={() => setActiveView('login')}
                 >
                   Sign In
                 </button>
                 <button
-                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
-                    activeView === 'register' 
-                      ? 'bg-[#184A47] text-white' 
+                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${activeView === 'register'
+                      ? 'bg-[#184A47] text-white'
                       : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
+                    }`}
                   onClick={() => setActiveView('register')}
                 >
                   Create Account
                 </button>
               </div>
-              
+
               {/* Authentication forms */}
               <div>
                 <h2 className="text-2xl font-bold mb-2 text-[#292930] dark:text-white font-montserrat">
                   {activeView === 'login' ? 'Sign in to your account' : 'Create a new account'}
                 </h2>
                 <p className="text-[#555555] dark:text-gray-300 mb-6 font-poppins">
-                  {activeView === 'login' 
+                  {activeView === 'login'
                     ? 'Enter your credentials below'
                     : 'Fill in your information to get started'
                   }
                 </p>
-                
+
                 {activeView === 'login' ? <LoginForm /> : <RegisterForm />}
-                
+
                 {/* Form switcher at bottom */}
                 <div className="mt-6 text-center">
                   {activeView === 'login' ? (
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Don't have an account?{' '}
-                      <button 
+                      <button
                         onClick={() => setActiveView('register')}
                         className="text-[#184A47] dark:text-green-400 font-medium hover:underline"
                       >
@@ -404,7 +402,7 @@ const AuthPage = () => {
                   ) : (
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       Already have an account?{' '}
-                      <button 
+                      <button
                         onClick={() => setActiveView('login')}
                         className="text-[#184A47] dark:text-green-400 font-medium hover:underline"
                       >
@@ -414,7 +412,7 @@ const AuthPage = () => {
                   )}
                 </div>
               </div>
-          </div>
+            </div>
           </div>
         </div>
       </div>

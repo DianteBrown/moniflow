@@ -8,6 +8,11 @@ export interface Transaction {
   category_id: string;
   date: string;
   type: 'income' | 'expense';
+  bank_info?: {
+    institution_name: string;
+    account_name: string;
+    account_type: string;
+  };
   created_at?: string;
   updated_at?: string;
 }
@@ -52,6 +57,7 @@ export interface BulkImportResponse {
 class TransactionService {
   async getTransactions(): Promise<Transaction[]> {
     const response = await api.get<{ transactions: Transaction[] }>('/budget/transactions');
+    console.log(response.data.transactions);
     return response.data.transactions;
   }
 
@@ -91,7 +97,7 @@ class TransactionService {
    */
   exportToCSV(transactions: Transaction[], categoryMap: Record<string, string>): string {
     // Define the CSV headers
-    const headers = ['Date', 'Type', 'Category', 'Description', 'Amount'];
+    const headers = ['Date', 'Type', 'Category', 'Description', 'Amount', 'Bank', 'Account'];
     
     // Convert transactions to CSV rows
     const rows = transactions.map(transaction => {
@@ -100,7 +106,9 @@ class TransactionService {
         transaction.type,
         categoryMap[transaction.category_id] || 'Unknown Category',
         transaction.description,
-        transaction.amount.toString()
+        transaction.amount.toString(),
+        transaction.bank_info?.institution_name || '',
+        transaction.bank_info?.account_name || ''
       ];
     });
     

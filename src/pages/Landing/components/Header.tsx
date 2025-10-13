@@ -6,7 +6,7 @@ interface HeaderProps {
   onGetStarted: () => void;
 }
 
-const Header = ({ onSignIn, onGetStarted }: HeaderProps) => {
+const Header = ({ onSignIn }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -28,7 +28,6 @@ const Header = ({ onSignIn, onGetStarted }: HeaderProps) => {
     <header className={`header ${scrolled ? "shadow-md" : ""}`}>
       <div className="header-container">
         <Link to="/" className="logo">
-          <img src="/assets/images/moniflow-logo.svg" alt="Moniflow Logo" />
           <span>Moniflow</span>
         </Link>
         
@@ -42,51 +41,14 @@ const Header = ({ onSignIn, onGetStarted }: HeaderProps) => {
             <path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" />
           </svg>
         </button>
-        
-        <nav className={`nav ${isMenuOpen ? "active" : ""}`}>
-          <ul className="nav-list">
-            <li className="nav-item"><a href="#features" onClick={() => setIsMenuOpen(false)}>Features</a></li>
-            <li className="nav-item"><a href="#pricing" onClick={() => setIsMenuOpen(false)}>Pricing</a></li>
-            <li className="nav-item"><a href="#testimonials" onClick={() => setIsMenuOpen(false)}>Testimonials</a></li>
-            <li className="nav-item"><a href="#faq" onClick={() => setIsMenuOpen(false)}>FAQ</a></li>
-          </ul>
-          
-          {/* Mobile buttons */}
-          <div className="mobile-header-buttons">
-            <button 
-              onClick={() => {
-                setIsMenuOpen(false);
-                onSignIn();
-              }} 
-              className="signin"
-            >
-              Sign in
-            </button>
-            <button 
-              onClick={() => {
-                setIsMenuOpen(false);
-                onGetStarted();
-              }} 
-              className="btn-primary"
-            >
-              Get Started Now
-            </button>
-          </div>
-        </nav>
-        
+                
         {/* Desktop buttons */}
         <div className="header-buttons">
           <button 
             onClick={onSignIn} 
             className="signin"
           >
-            Sign in
-          </button>
-          <button 
-            onClick={onGetStarted} 
-            className="btn-primary"
-          >
-            Get Started Now
+            Login/Sign in
           </button>
         </div>
       </div>

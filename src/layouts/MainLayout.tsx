@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  LayoutDashboard, 
+import {
+  LayoutDashboard,
   LogOut,
   Menu,
   X
@@ -11,6 +11,7 @@ import { authService } from "@/services/authService";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import SubscriptionBadge from "@/components/subscription/SubscriptionBadge";
+import AIChatBot from "@/components/chat/AIChatBot";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
 
   const handleLogout = () => {
     try {
@@ -31,6 +33,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
       console.error("Logout error:", error);
     }
   };
+
+
+
+  // Automatically open Plaid Link when token is available and ready
+
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -55,11 +62,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary ${
-                    isActive(item.path) 
-                      ? "text-primary" 
-                      : "text-muted-foreground"
-                  }`}
+                  className={`flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary ${isActive(item.path)
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                    }`}
                 >
                   <item.icon className="h-4 w-4" />
                   <span>{item.label}</span>
@@ -69,15 +75,16 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <div className="flex items-center space-x-2 border-l pl-4 ml-2">
                 <SubscriptionBadge />
                 <ThemeToggle />
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-red-500 dark:text-red-400" 
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-500 dark:text-red-400"
                   onClick={handleLogout}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
+
               </div>
             </nav>
 
@@ -109,21 +116,20 @@ export default function MainLayout({ children }: MainLayoutProps) {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary ${
-                  isActive(item.path) 
-                    ? "text-primary" 
-                    : "text-muted-foreground"
-                }`}
+                className={`flex items-center space-x-2 text-sm font-medium transition-colors hover:text-primary ${isActive(item.path)
+                  ? "text-primary"
+                  : "text-muted-foreground"
+                  }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <item.icon className="h-5 w-5" />
                 <span>{item.label}</span>
               </Link>
             ))}
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="justify-start text-red-500 dark:text-red-400" 
+            <Button
+              variant="ghost"
+              size="sm"
+              className="justify-start text-red-500 dark:text-red-400"
               onClick={handleLogout}
             >
               <LogOut className="h-5 w-5 mr-2" />
@@ -139,6 +145,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
           {children}
         </div>
       </main>
+
+      {/* AI Chat Bot */}
+      <AIChatBot />
     </div>
   );
-} 
+}

@@ -2,15 +2,11 @@ import { useNavigate } from "react-router-dom";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import HomepageScreenshot from "./components/HomepageScreenshot";
-import Partners from "./components/Partners";
+import GetStarted from "./components/GetStarted";
 import KeyFeatures from "./components/KeyFeatures";
-import FeatureScreenshot from "./components/FeatureScreenshot";
-import HowItWorks from "./components/HowItWorks";
-import Testimonials from "./components/Testimonials";
-import Pricing from "./components/Pricing";
-import FAQ from "./components/FAQ";
-import CTA from "./components/CTA";
 import Footer from "./components/Footer";
+import AboutUs from "./components/AboutUs";
+
 import "./landing-page.css";
 
 const LandingPage = () => {
@@ -27,16 +23,11 @@ const LandingPage = () => {
   return (
     <div className="landing-page">
       <Header onSignIn={handleSignIn} onGetStarted={handleGetStarted} />
-      <Hero onSignIn={handleSignIn} onGetStarted={handleGetStarted} />
+      <Hero />
       <HomepageScreenshot />
-      <Partners />
+      <GetStarted onGetStarted={handleGetStarted} />
       <KeyFeatures />
-      <FeatureScreenshot />
-      <HowItWorks />
-      <Testimonials />
-      <Pricing onGetStarted={handleGetStarted} />
-      <FAQ />
-      <CTA />
+      <AboutUs />
       <Footer />
     </div>
   );

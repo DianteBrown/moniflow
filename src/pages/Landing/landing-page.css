@@ -1,7 +1,7 @@
 /* Landing page specific styles */
 .landing-page {
     font-family: 'Poppins', 'Montserrat', 'Sora', sans-serif;
-    background-color: #fff;
+    background-color: #000000;
     color: var(--text-color);
 }
 
@@ -16,9 +16,10 @@
     --light-gray: #F9F9F9;
     --gray: #6B6573;
     --dark-gray: #292930;
-    --text-color: #292930;
+    --text-color: #FFFFFF;
     --text-gray: #555555;
     --text-light: #555555;
+    --gray-background: #060609;
 }
 
 /* Global button styles */
@@ -880,7 +881,7 @@ html {
 
 /* Footer */
 .footer {
-    background-color: var(--dark-primary);
+    background-color: var(--gray-background);
     padding: 4rem 0 0;
 }
 
@@ -904,6 +905,7 @@ html {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    background-color: var(--black);
     margin-bottom: 2.4rem;
 }
 
@@ -988,8 +990,11 @@ html {
     color: var(--white);
 }
 
+.footer-company-info {
+    padding: 1.6rem 0;
+    text-align: center;
+}
 .footer-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
     padding: 1.6rem 0;
     text-align: center;
 }
@@ -1023,7 +1028,7 @@ html {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: var(--light-primary);
+    background-color: #000000;
     padding: 1.2rem 0;
     z-index: 100;
     transition: all 0.3s ease;
@@ -1037,13 +1042,14 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    
 }
 
 .logo {
     font-family: 'Sora', sans-serif;
     font-size: 1.6rem;
     font-weight: 600;
-    color: var(--secondary-color);
+    color: var(--text-color);
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -1095,7 +1101,7 @@ html {
     font-family: 'Poppins', sans-serif;
     font-size: 1rem;
     font-weight: 500;
-    color: var(--text-color);
+    color: #ffffff;
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -1282,6 +1288,8 @@ html {
     position: relative;
     padding: 0 0 0 0;
     margin-top: -60px;
+    background-color: var(--gray-background);
+
 }
 
 .homepage-screenshot-section::before {
@@ -1291,7 +1299,7 @@ html {
     left: 0;
     width: 100%;
     height: 50%;
-    background-color: #DDE9E8;
+    background-color: var(--gray-background);
     z-index: 1;
 }
 
@@ -1402,7 +1410,6 @@ html {
 .hero-section {
     padding-top: 140px;
     padding-bottom: 120px;
-    background-color: #DDE9E8;
     position: relative;
 }
 
@@ -1421,8 +1428,7 @@ html {
 .hero-title {
     font-family: var(--font-heading);
     font-size: 3.2rem;
-    font-weight: 700;
-    color: var(--primary-color);
+    color: #ffffff;
     line-height: 1.2;
     margin-bottom: 20px;
 }
@@ -1430,7 +1436,7 @@ html {
 .hero-subtitle {
     font-family: var(--font-body);
     font-size: 18px;
-    color: var(--primary-color);
+    color: #ffffff;
     margin-bottom: 32px;
     max-width: 660px;
     margin-left: auto;
@@ -1543,6 +1549,76 @@ html {
     font-weight: 500;
     letter-spacing: -0.025em;
 }
+
+/* Get Started Section */
+.get-started-section {
+    padding: 0px 0 0px;
+    position: relative;
+}
+
+.get-started-container {
+    max-width: 1140px;
+    padding: 0 20px;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 70px;
+    margin-bottom: 70px;   
+}
+.get-started-button {
+    background-color: #00A626;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    scale: 2;
+}
+
+.about-us-section {
+    padding-top: 140px;
+    padding-bottom: 120px;
+    position: relative;
+}
+
+.about-us-container {
+    max-width: 1140px;
+    padding: 0 20px;
+    margin: 0 auto;
+}
+
+.about-us-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.about-us-title {
+    font-family: var(--font-heading);
+    font-size: 3.2rem;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 80px;
+}
+
+.about-us-subtitle {
+    font-family: var(--font-body);
+    font-size: 18px;
+    color: #ffffff;
+    margin-bottom: 50px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.about-us-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+
 
 @media (max-width: 768px) {
     .hero-section {

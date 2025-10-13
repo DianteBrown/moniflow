@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -44,7 +44,7 @@ export default function BudgetGoalSection() {
   const [recentlyUpdated, setRecentlyUpdated] = useState<string | null>(null);
   
   // Compute modal state derived values
-  const isModalOpen = modalState.type !== null;
+  const isModalOpen = modalState.type !== null && modalState.category !== null;
   const selectedCategory = modalState.category;
   const isEditing = modalState.type === 'edit';
 
@@ -73,6 +73,34 @@ export default function BudgetGoalSection() {
     setModalState({ type: null, category: null });
     setBudgetAmount("");
   };
+
+  const handleModalOpenChange = (open: boolean) => {
+    if (!open) {
+      closeModal();
+    }
+  };
+
+  // Safety effect to ensure modal state is consistent
+  useEffect(() => {
+    // If modal type is set but category is null, reset the modal state
+    if (modalState.type !== null && modalState.category === null) {
+      setModalState({ type: null, category: null });
+    }
+  }, [modalState]);
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isModalOpen) {
+        closeModal();
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+      return () => document.removeEventListener('keydown', handleEscapeKey);
+    }
+  }, [isModalOpen]);
 
   const handleSetBudget = async () => {
     if (!selectedCategory || !budgetAmount || isNaN(Number(budgetAmount))) {
@@ -141,13 +169,23 @@ export default function BudgetGoalSection() {
   };
 
   const openBudgetModal = (category: UnbudgetedCategory) => {
-    setModalState({ type: 'add', category });
-    setBudgetAmount("");
+    // Ensure any existing modal is closed first
+    closeModal();
+    // Use setTimeout to ensure state is properly reset
+    setTimeout(() => {
+      setModalState({ type: 'add', category });
+      setBudgetAmount("");
+    }, 0);
   };
 
   const openEditBudgetModal = (category: BudgetedCategory) => {
-    setModalState({ type: 'edit', category });
-    setBudgetAmount(category.monthly_budget?.toString() || "0");
+    // Ensure any existing modal is closed first
+    closeModal();
+    // Use setTimeout to ensure state is properly reset
+    setTimeout(() => {
+      setModalState({ type: 'edit', category });
+      setBudgetAmount(category.monthly_budget?.toString() || "0");
+    }, 0);
   };
 
   const openDeleteBudgetModal = (category: BudgetedCategory) => {
@@ -348,7 +386,7 @@ export default function BudgetGoalSection() {
 
       {/* Budget Setting Dialog */}
       {(modalState.type === 'add' || modalState.type === 'edit') && (
-        <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
+        <Dialog open={isModalOpen} onOpenChange={handleModalOpenChange}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>

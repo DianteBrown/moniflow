@@ -34,7 +34,8 @@ export default function TransactionsSection() {
   const { 
     data: transactions = [], 
     isLoading: isTransactionsLoading,
-    isRefetching: isTransactionsRefetching 
+    isRefetching: isTransactionsRefetching,
+    refetch: refetchTransactions
   } = useTransactions();
   
   const {
@@ -95,10 +96,6 @@ export default function TransactionsSection() {
     }
   };
 
-  const handleEditClick = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setIsEditModalOpen(true);
-  };
 
   return (
     <div className="space-y-8">
@@ -171,9 +168,7 @@ export default function TransactionsSection() {
             categories={categories}
             loading={loading}
             isRefreshing={isTransactionsRefetching}
-            onAddClick={() => setIsAddModalOpen(true)}
-            onEditClick={handleEditClick}
-            onDeleteClick={(transaction) => setTransactionToDelete(transaction)}
+            onRefreshTransactions={() => refetchTransactions()}
           />
         </AnimatePresence>
       </div>
