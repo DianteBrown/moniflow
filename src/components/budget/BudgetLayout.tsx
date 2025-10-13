@@ -58,7 +58,7 @@ export default function BudgetLayout() {
       value={activeTab}
       onValueChange={setActiveTab}
     >
-      <TabsList className="grid w-full grid-cols-3 h-14">
+      <TabsList className="grid w-full grid-cols-3 h-14 sticky top-16 z-30 bg-background border-b shadow-sm">
         <TabsTrigger value="transactions" className="flex items-center gap-2">
           <Receipt className="h-5 w-5" />
           <span className="hidden sm:inline">Transactions</span>
@@ -73,15 +73,15 @@ export default function BudgetLayout() {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="transactions" className="space-y-4">
+      <TabsContent value="transactions" className="space-y-4 pt-4">
         <TransactionsSection />
       </TabsContent>
 
-      <TabsContent value="budget-goals" className="space-y-4">
+      <TabsContent value="budget-goals" className="space-y-4 pt-4">
         <BudgetGoalSection />
       </TabsContent>
 
-      <TabsContent value="analysis" className="space-y-4">
+      <TabsContent value="analysis" className="space-y-4 pt-4">
         <AnalysisSection />
       </TabsContent>
     </Tabs>
