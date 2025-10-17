@@ -1,3 +1,4 @@
+// Update src/layouts/MainLayout.tsx
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -5,13 +6,13 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
-  X
+  X,
+  User // Add this import
 } from "lucide-react";
 import { authService } from "@/services/authService";
 import { toast } from "sonner";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import SubscriptionBadge from "@/components/subscription/SubscriptionBadge";
-import AIChatBot from "@/components/chat/AIChatBot";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -21,7 +22,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
 
   const handleLogout = () => {
     try {
@@ -34,13 +34,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
     }
   };
 
-
-
-  // Automatically open Plaid Link when token is available and ready
-
-
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+    { icon: User, label: "Profile", path: "/profile" }, // Add this line
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -84,7 +80,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
-
               </div>
             </nav>
 
@@ -145,9 +140,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
           {children}
         </div>
       </main>
-
-      {/* AI Chat Bot */}
-      <AIChatBot />
     </div>
   );
 }

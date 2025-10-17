@@ -1,6 +1,6 @@
 const AboutUs = () => {
     return (
-        <section className="about-us-section">
+        <section id="about" className="about-us-section">
             <div className="about-us-container">
                 <div className="about-us-content">
                     <h1 className="about-us-title">
@@ -13,7 +13,7 @@ const AboutUs = () => {
                         spending, and set goals with clarity. Built with precision
                         and designed for ease, Moniflow combines intuitive
                         design with powerful financial tools — giving you full
-                        control over your financial journey.
+                        control over your financial journey. Your data is encrypted and secure.
                     </p>
                 </div>
             </div>

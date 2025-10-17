@@ -169,6 +169,14 @@ export default function TransactionsSection() {
             loading={loading}
             isRefreshing={isTransactionsRefetching}
             onRefreshTransactions={() => refetchTransactions()}
+            onCreateTransaction={handleAddTransaction}
+            onUpdateTransaction={handleEditTransaction}
+            onDeleteTransaction={(transactionId) => {
+              const transaction = transactions.find(t => t.id === transactionId);
+              if (transaction) {
+                handleDeleteTransaction(transaction);
+              }
+            }}
           />
         </AnimatePresence>
       </div>

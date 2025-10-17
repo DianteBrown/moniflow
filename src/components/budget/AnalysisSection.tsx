@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronDown, ChevronLeft, ChevronRight, Filter, Lock } from "lucide-react";
-import { 
-  PieChart, Pie, Cell, ResponsiveContainer, 
+import {
+  PieChart, Pie, Cell, ResponsiveContainer,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area, AreaChart
 } from "recharts";
 import {
@@ -18,12 +18,15 @@ import { useTransactions } from "@/hooks/queries/useTransactions";
 import { useCategories } from "@/hooks/queries/useCategories";
 import { useSubscription, useHasAdvancedCharts } from "@/hooks/queries/useSubscription";
 import { toast } from "sonner";
+import AIChatBot from "../chat/AIChatBot";
+import { CategoryIconComponent } from "../icons/CategoryIcons";
 
 interface CategorySpending {
   name: string;
   amount: number;
   color: string;
   percentage: number;
+  icon?: string;
 }
 
 type OverviewType = 'expense' | 'income' | 'expense-flow' | 'income-flow';
@@ -49,22 +52,22 @@ export default function AnalysisSection() {
   const [flowData, setFlowData] = useState<FlowDataPoint[]>([]);
 
   // Query hooks
-  const { 
-    data: transactions = [], 
-    isLoading: isTransactionsLoading 
+  const {
+    data: transactions = [],
+    isLoading: isTransactionsLoading
   } = useTransactions();
-  
-  const { 
+
+  const {
     data: categories = [],
-    isLoading: isCategoriesLoading 
+    isLoading: isCategoriesLoading
   } = useCategories();
-  
+
   const {
     isLoading: isSubscriptionLoading
   } = useSubscription();
-  
+
   const hasAdvancedCharts = useHasAdvancedCharts();
-  
+
   const loading = isTransactionsLoading || isCategoriesLoading || isSubscriptionLoading;
 
   useEffect(() => {
@@ -113,12 +116,12 @@ export default function AnalysisSection() {
 
   const processTransactions = () => {
     const { start, end } = getDateRange();
-    
+
     const periodTransactions = transactions.filter(t => {
       const transactionDate = new Date(t.date);
       return transactionDate >= start && transactionDate <= end;
     });
-    
+
     let totalExp = 0;
     let totalInc = 0;
 
@@ -149,11 +152,12 @@ export default function AnalysisSection() {
         name: cat.name,
         amount,
         color: cat.color,
-        percentage: totalExp > 0 ? (amount / totalExp) * 100 : 0
+        percentage: totalExp > 0 ? (amount / totalExp) * 100 : 0,
+        icon: cat.icon
       };
     })
-    .filter(category => category.amount > 0)
-    .sort((a, b) => b.amount - a.amount);
+      .filter(category => category.amount > 0)
+      .sort((a, b) => b.amount - a.amount);
 
     // Process income categories
     const incomeData = categories.map(cat => {
@@ -162,11 +166,12 @@ export default function AnalysisSection() {
         name: cat.name,
         amount,
         color: cat.color,
-        percentage: totalInc > 0 ? (amount / totalInc) * 100 : 0
+        percentage: totalInc > 0 ? (amount / totalInc) * 100 : 0,
+        icon: cat.icon
       };
     })
-    .filter(category => category.amount > 0)
-    .sort((a, b) => b.amount - a.amount);
+      .filter(category => category.amount > 0)
+      .sort((a, b) => b.amount - a.amount);
 
     setExpenseCategories(expenseData);
     setIncomeCategories(incomeData);
@@ -174,43 +179,43 @@ export default function AnalysisSection() {
 
   const processFlowData = () => {
     const { start, end } = getDateRange();
-    
+
     // Filter transactions in the selected period
     const periodTransactions = transactions.filter(t => {
       const transactionDate = new Date(t.date);
       return transactionDate >= start && transactionDate <= end;
     });
-    
+
     // Create a map for all days in the period with zero values
     const dataByDate = new Map<string, { date: string, income: number, expense: number }>();
-    
+
     // Initialize all days in the period with zero values
     const currentDate = new Date(start);
-    
+
     // Loop through each day in the range
     while (currentDate <= end) {
       const dateStr = format(currentDate, 'yyyy-MM-dd');
       dataByDate.set(dateStr, { date: dateStr, income: 0, expense: 0 });
-      
+
       // Move to next day
       currentDate.setDate(currentDate.getDate() + 1);
     }
-    
+
     // Fill in actual transaction data
     periodTransactions.forEach(t => {
       const dateStr = format(new Date(t.date), 'yyyy-MM-dd');
       const entry = dataByDate.get(dateStr);
-      
+
       // Skip if the date is not in our map (shouldn't happen, but just in case)
       if (!entry) return;
-      
+
       if (t.type === 'income') {
         entry.income += t.amount;
       } else {
         entry.expense += t.amount;
       }
     });
-    
+
     // Determine date format based on view period
     const getDateFormat = () => {
       switch (viewPeriod) {
@@ -227,28 +232,28 @@ export default function AnalysisSection() {
           return 'MMM dd';
       }
     };
-    
+
     // For longer periods, we might want to aggregate data
     let finalData: FlowDataPoint[];
-    
+
     if (viewPeriod === 'year') {
       // Aggregate by month for yearly view
       const monthlyData = new Map<string, { date: string, income: number, expense: number }>();
-      
+
       Array.from(dataByDate.entries()).forEach(([dateStr, data]) => {
         const date = new Date(dateStr);
         const monthKey = format(date, 'yyyy-MM');
         const monthLabel = format(date, 'MMM');
-        
+
         if (!monthlyData.has(monthKey)) {
           monthlyData.set(monthKey, { date: monthLabel, income: 0, expense: 0 });
         }
-        
+
         const monthEntry = monthlyData.get(monthKey)!;
         monthEntry.income += data.income;
         monthEntry.expense += data.expense;
       });
-      
+
       finalData = Array.from(monthlyData.values())
         .map(item => ({
           ...item,
@@ -264,7 +269,7 @@ export default function AnalysisSection() {
           balance: item.income - item.expense
         }));
     }
-    
+
     setFlowData(finalData);
   };
 
@@ -314,7 +319,7 @@ export default function AnalysisSection() {
 
   const { format: dateFormat } = getDateRange();
   const displayedCategories = overviewType === 'expense' ? expenseCategories : incomeCategories;
-  
+
   // Determine if we're showing a flow chart
   const isFlowView = overviewType === 'income-flow' || overviewType === 'expense-flow';
 
@@ -329,9 +334,9 @@ export default function AnalysisSection() {
       <div className="flex flex-col gap-2">
         <span className="font-semibold">Upgrade to Premium</span>
         <span className="text-sm">Get access to advanced charts, extended history, and more!</span>
-        <Button 
-          size="sm" 
-          variant="default" 
+        <Button
+          size="sm"
+          variant="default"
           className="mt-1 bg-green-600 hover:bg-green-700"
           onClick={() => window.location.href = '/subscription/manage'}
         >
@@ -351,7 +356,7 @@ export default function AnalysisSection() {
       showUpgradePrompt();
       return;
     }
-    
+
     setViewPeriod(period);
   };
 
@@ -367,11 +372,11 @@ export default function AnalysisSection() {
       showUpgradePrompt();
       return;
     }
-    
+
     setOverviewType(viewType);
   };
 
-    return (
+  return (
     <Card className="border dark:border-gray-800">
       <CardContent className="p-6 space-y-8">
         {/* Premium Banner */}
@@ -381,9 +386,9 @@ export default function AnalysisSection() {
               <div>
                 <h3 className="text-lg font-semibold mb-1">Upgrade to Premium</h3>
                 <p className="text-sm opacity-90">Get access to advanced charts, flow analysis, and extended history!</p>
-            </div>
-              <Button 
-                variant="default" 
+              </div>
+              <Button
+                variant="default"
                 size="sm"
                 className="bg-white text-blue-600 hover:bg-blue-50 border-none"
                 onClick={() => window.location.href = '/subscription/manage'}
@@ -397,26 +402,26 @@ export default function AnalysisSection() {
         {/* Period Navigation */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                size="icon"
-                onClick={handlePreviousMonth}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handlePreviousMonth}
               disabled={loading}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
             <span className="text-base font-medium">
               {format(selectedDate, dateFormat)}
             </span>
-              <Button
-              variant="outline" 
-                size="icon"
-                onClick={handleNextMonth}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleNextMonth}
               disabled={loading}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
 
           <div className="flex items-center gap-2">
             <DropdownMenu>
@@ -438,7 +443,7 @@ export default function AnalysisSection() {
                 <DropdownMenuItem onClick={() => handlePeriodSelect('month')}>
                   Monthly
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handlePeriodSelect('3months')}
                   disabled={!hasAdvancedCharts}
                   className="relative"
@@ -448,7 +453,7 @@ export default function AnalysisSection() {
                     <Lock className="h-3.5 w-3.5 ml-2 text-muted-foreground" />
                   )}
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handlePeriodSelect('6months')}
                   disabled={!hasAdvancedCharts}
                   className="relative"
@@ -458,7 +463,7 @@ export default function AnalysisSection() {
                     <Lock className="h-3.5 w-3.5 ml-2 text-muted-foreground" />
                   )}
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handlePeriodSelect('year')}
                   disabled={!hasAdvancedCharts}
                   className="relative"
@@ -501,7 +506,9 @@ export default function AnalysisSection() {
               </div>
             )}
           </div>
-            </div>
+        </div>
+        <AIChatBot />
+
 
         {/* Toggle & Chart */}
         <div className="flex flex-col items-center">
@@ -523,7 +530,7 @@ export default function AnalysisSection() {
                 <DropdownMenuItem onClick={() => handleViewTypeSelect('income')}>
                   Income
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handleViewTypeSelect('expense-flow')}
                   disabled={!hasAdvancedCharts}
                   className="relative"
@@ -533,7 +540,7 @@ export default function AnalysisSection() {
                     <Lock className="h-3.5 w-3.5 ml-2 text-muted-foreground" />
                   )}
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handleViewTypeSelect('income-flow')}
                   disabled={!hasAdvancedCharts}
                   className="relative"
@@ -545,7 +552,7 @@ export default function AnalysisSection() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-        </div>
+          </div>
 
           {loading ? (
             <div className="w-full max-w-md h-80 flex items-center justify-center">
@@ -555,7 +562,7 @@ export default function AnalysisSection() {
             <div className="w-full h-80">
               <div className="text-center mb-2 font-semibold">
                 {overviewType === 'income-flow' ? 'Income Flow' : 'Expense Flow'} - {format(selectedDate, dateFormat)}
-      </div>
+              </div>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={flowData}
@@ -563,36 +570,36 @@ export default function AnalysisSection() {
                 >
                   <defs>
                     <linearGradient id="incomeColorGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.2}/>
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.2} />
                     </linearGradient>
                     <linearGradient id="expenseColorGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.2}/>
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.2} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis 
-                    dataKey="date" 
+                  <XAxis
+                    dataKey="date"
                     interval={
                       viewPeriod === 'week' ? 0 :
-                      viewPeriod === 'month' ? 2 :
-                      viewPeriod === '3months' || viewPeriod === '6months' ? 7 :
-                      viewPeriod === 'year' ? 0 : 2
+                        viewPeriod === 'month' ? 2 :
+                          viewPeriod === '3months' || viewPeriod === '6months' ? 7 :
+                            viewPeriod === 'year' ? 0 : 2
                     }
                     tickFormatter={(tick) => tick}
                     tickMargin={5}
                     axisLine={{ stroke: '#e5e7eb' }}
                     tick={{ fill: '#6B7280', fontSize: 12 }}
                   />
-                  <YAxis 
+                  <YAxis
                     tickFormatter={(tick) => `$${tick}`}
                     width={60}
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: '#6B7280', fontSize: 12 }}
                   />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value: number) => [
                       formatCurrency(value),
                       overviewType === 'income-flow' ? 'Income' : 'Expense'
@@ -615,25 +622,25 @@ export default function AnalysisSection() {
                       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                   />
-                  <Legend 
+                  <Legend
                     verticalAlign="top"
                     height={36}
                     iconType="circle"
                   />
                   {overviewType === 'income-flow' ? (
-                    <Area 
-                      type="monotone" 
-                      dataKey="income" 
-                      stroke="#10b981" 
-                      fill="url(#incomeColorGradient)" 
+                    <Area
+                      type="monotone"
+                      dataKey="income"
+                      stroke="#10b981"
+                      fill="url(#incomeColorGradient)"
                       name="Income"
                       activeDot={{ r: 6, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }}
                     />
                   ) : (
-                    <Area 
-                      type="monotone" 
-                      dataKey="expense" 
-                      stroke="#ef4444" 
+                    <Area
+                      type="monotone"
+                      dataKey="expense"
+                      stroke="#ef4444"
                       fill="url(#expenseColorGradient)"
                       name="Expense"
                       activeDot={{ r: 6, stroke: '#ef4444', strokeWidth: 2, fill: '#fff' }}
@@ -648,26 +655,26 @@ export default function AnalysisSection() {
             </div>
           ) : (
             <div className="w-full max-w-md h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
                     data={displayedCategories}
-                        cx="50%"
-                        cy="50%"
+                    cx="50%"
+                    cy="50%"
                     labelLine={false}
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="amount"
                   >
                     {displayedCategories.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           )}
-                    </div>
+        </div>
 
         {/* Category List - only show for non-flow views */}
         {!isFlowView && (
@@ -694,11 +701,13 @@ export default function AnalysisSection() {
                 >
                   <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: category.color }}
+                        <CategoryIconComponent
+                          iconId={(category.icon && category.icon.trim() !== '') ? category.icon : "shopping-cart"}
+                          size={20}
+                          style={{ color: category.color }}
+                          className="flex-shrink-0"
                         />
-                      <span className="font-medium">{category.name}</span>
+                        <span className="font-medium">{category.name}</span>
                     </div>
                     <span className="text-sm text-muted-foreground">
                       {category.percentage.toFixed(1)}%
@@ -706,13 +715,13 @@ export default function AnalysisSection() {
                   </div>
                   <div className="text-xl font-bold">
                     {formatCurrency(category.amount)}
-              </div>
+                  </div>
                 </div>
               ))
             )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 } 

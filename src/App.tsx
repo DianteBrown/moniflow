@@ -9,6 +9,9 @@ import PricingPage from "./pages/subscription/PricingPage";
 import ManageSubscription from "./pages/subscription/ManageSubscription";
 import { SubscriptionProvider } from "./context/SubscriptionContext";
 import LandingPage from "./pages/Landing/LandingPage";
+import { Toaster } from "sonner";
+import Profile from "./pages/Profile/Profile";
+import PlaidOAuthCallback from "./components/plaid/PlaidOAuthCallback";
 
 function App() {
   const isAuthenticated = authService.isAuthenticated();
@@ -27,11 +30,12 @@ function App() {
         <Routes>
           {/* Landing page route */}
           <Route path="/" element={<LandingPage />} />
-          
+
           {/* Public routes */}
           <Route path="/auth" element={!isAuthenticated ? <AuthPage /> : <Navigate to="/dashboard" />} />
           <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} />
           <Route path="/reset-password/:token" element={!isAuthenticated ? <ResetPassword /> : <Navigate to="/dashboard" />} />
+          <Route path="/oauth/plaid/callback" element={<PlaidOAuthCallback />} />
           {/* Protected routes */}
           <Route
             path="/dashboard"
@@ -41,7 +45,7 @@ function App() {
               </AuthenticatedRoute>
             }
           />
-          
+
           <Route
             path="/pricing"
             element={
@@ -50,7 +54,7 @@ function App() {
               </AuthenticatedRoute>
             }
           />
-          
+
           <Route
             path="/subscription/manage"
             element={
@@ -59,10 +63,20 @@ function App() {
               </AuthenticatedRoute>
             }
           />
-          
+          <Route
+            path="/profile"
+            element={
+              <AuthenticatedRoute>
+                <Profile />
+              </AuthenticatedRoute>
+            }
+          />
           {/* Catch all route - redirect to home */}
           <Route path="*" element={<Navigate to="/" />} />
+
+
         </Routes>
+        <Toaster />
       </SubscriptionProvider>
     </Router>
   );

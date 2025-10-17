@@ -79,11 +79,8 @@ class PlaidService {
   private accessToken: string | null = null;
 
   async createLinkToken(): Promise<PlaidLinkTokenResponse> {
-    const response = await api.post('/plaid/create-link-token', {
-      // Add any user-specific data for the link token
-      user_id: localStorage.getItem('userId') || 'demo-user',
-      client_name: 'Moniflow Budget App'
-    });
+    // Don't send any body data - backend gets user from JWT token
+    const response = await api.post('/plaid/create-link-token');
     console.log('createLinkToken function called', response.data);
     return response.data;
   }
@@ -121,6 +118,18 @@ class PlaidService {
       count,
     });
     return response.data;
+  }
+  // Add this method to your PlaidService class
+  async handleOAuthCallback(receivedRedirectUri: string): Promise<any> {
+    try {
+      const response = await api.post('/plaid/oauth-callback', {
+        receivedRedirectUri
+      });
+      return response.data;
+    } catch (error) {
+      console.error('OAuth callback error:', error);
+      throw error;
+    }
   }
 
   // Method to get the current access token

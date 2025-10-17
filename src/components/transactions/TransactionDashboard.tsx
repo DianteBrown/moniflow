@@ -2,16 +2,21 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Filter, X, Building2, List, ChartPie } from "lucide-react";
-import { Transaction } from "@/services/transactionService";
+import { Transaction, CreateTransactionData } from "@/services/transactionService";
 import { Category } from "@/services/categoryService";
 import { format, getMonth, getYear } from "date-fns";
-import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import SpendingChart from "@/components/visualizations/SpendingChart";
 import BankAccounts from "./BankAccounts";
+import EditTransactionModal from "./EditTransactionModal";
+import DeleteTransactionDialog from "./DeleteTransactionDialog";
+import { Tag, TrendingUp } from "lucide-react";
+import AddTransactionModal from "./AddTransactionModal";
+import TransactionList from "./TransactionList";
 
 interface TransactionDashboardProps {
   transactions: Transaction[];
@@ -19,33 +24,21 @@ interface TransactionDashboardProps {
   loading: boolean;
   isRefreshing?: boolean;
   onRefreshTransactions?: () => void;
+  onCreateTransaction?: (transactionData: CreateTransactionData) => void; // Add this
+  onUpdateTransaction?: (transaction: Transaction) => void; // Add this
+  onDeleteTransaction?: (transactionId: string) => void; // Add this
 }
 
-const TransactionSkeleton = () => (
-  <div className="flex items-center justify-between p-4 border rounded-lg dark:border-gray-800">
-    <div className="flex items-start gap-3">
-      <Skeleton className="w-3 h-3 rounded-full mt-1.5" />
-      <div>
-        <Skeleton className="h-5 w-32 mb-2" />
-        <Skeleton className="h-4 w-48" />
-      </div>
-    </div>
-    <div className="flex items-center gap-4">
-      <Skeleton className="h-5 w-20" />
-      <div className="flex gap-1">
-        <Skeleton className="h-8 w-8 rounded-lg" />
-        <Skeleton className="h-8 w-8 rounded-lg" />
-      </div>
-    </div>
-  </div>
-);
 
 export default function TransactionDashboard({
   transactions,
   categories,
   loading,
   isRefreshing = false,
-  onRefreshTransactions
+  onRefreshTransactions,
+  onCreateTransaction,
+  onUpdateTransaction,
+  onDeleteTransaction,
 }: TransactionDashboardProps) {
   const [sortBy, setSortBy] = useState<'date' | 'amount' | 'description' | 'category'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -54,15 +47,22 @@ export default function TransactionDashboard({
   const [selectedBanks, setSelectedBanks] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isBankFilterOpen, setIsBankFilterOpen] = useState(false);
+  const [isCategoryFilterOpen, setIsCategoryFilterOpen] = useState(false);
+  const [isTypeFilterOpen, setIsTypeFilterOpen] = useState(false);
 
-  const getCategoryName = (categoryId: string) => {
-    const category = categories.find(cat => cat.id === categoryId);
-    return category?.name || 'Unknown Category';
-  };
-
-  const getCategoryColor = (categoryId: string) => {
-    const category = categories.find(cat => cat.id === categoryId);
-    return category?.color || '#6B7280';
+  const toggleTypeFilter = (type: string) => {
+    setSelectedTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    );
   };
 
   // Get available periods
@@ -98,12 +98,22 @@ export default function TransactionDashboard({
   // Get available banks from transactions
   const availableBanks = useMemo(() => {
     const banks = new Set<string>();
+    let hasManualTransactions = false;
+
     transactions.forEach(transaction => {
       if (transaction.bank_info?.institution_name) {
         banks.add(transaction.bank_info.institution_name);
+      } else if (transaction.is_manual_created) {
+        hasManualTransactions = true;
       }
     });
-    return Array.from(banks).sort();
+
+    const bankList = Array.from(banks).sort();
+    if (hasManualTransactions) {
+      bankList.unshift('No Bank');
+    }
+
+    return bankList;
   }, [transactions]);
 
   // Get available categories
@@ -126,14 +136,28 @@ export default function TransactionDashboard({
 
     // Filter by selected banks
     if (selectedBanks.length > 0) {
-      filteredTransactions = filteredTransactions.filter(t => 
-        t.bank_info?.institution_name && selectedBanks.includes(t.bank_info.institution_name)
+      filteredTransactions = filteredTransactions.filter(t => {
+        if (selectedBanks.includes('No Bank')) {
+          // Include manual transactions (no bank info)
+          if (t.is_manual_created && !t.bank_info?.institution_name) {
+            return true;
+          }
+        }
+        // Include transactions from selected banks
+        return t.bank_info?.institution_name && selectedBanks.includes(t.bank_info.institution_name);
+      });
+    }
+
+    // Filter by selected types
+    if (selectedTypes.length > 0) {
+      filteredTransactions = filteredTransactions.filter(t =>
+        selectedTypes.includes(t.type)
       );
     }
 
     // Filter by selected categories
     if (selectedCategories.length > 0) {
-      filteredTransactions = filteredTransactions.filter(t => 
+      filteredTransactions = filteredTransactions.filter(t =>
         selectedCategories.includes(t.category_id)
       );
     }
@@ -152,8 +176,8 @@ export default function TransactionDashboard({
           ? b.description.localeCompare(a.description)
           : a.description.localeCompare(b.description);
       } else if (sortBy === 'category') {
-        const aCategory = getCategoryName(a.category_id);
-        const bCategory = getCategoryName(b.category_id);
+        const aCategory = categories.find(cat => cat.id === a.category_id)?.name || 'Unknown Category';
+        const bCategory = categories.find(cat => cat.id === b.category_id)?.name || 'Unknown Category';
         return sortOrder === 'desc'
           ? bCategory.localeCompare(aCategory)
           : aCategory.localeCompare(bCategory);
@@ -166,54 +190,52 @@ export default function TransactionDashboard({
 
 
   const toggleBankFilter = (bank: string) => {
-    setSelectedBanks(prev => 
-      prev.includes(bank) 
+    setSelectedBanks(prev =>
+      prev.includes(bank)
         ? prev.filter(b => b !== bank)
         : [...prev, bank]
     );
   };
 
   const toggleCategoryFilter = (categoryId: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(categoryId) 
+    setSelectedCategories(prev =>
+      prev.includes(categoryId)
         ? prev.filter(c => c !== categoryId)
         : [...prev, categoryId]
     );
   };
 
+  // Update the clearAllFilters function:
   const clearAllFilters = () => {
     setSelectedBanks([]);
     setSelectedCategories([]);
+    setSelectedTypes([]);
+  };
+  const onEditClick = (transaction: Transaction) => {
+    console.log('Edit clicked for transaction:', transaction);
+    setSelectedTransaction(transaction);
+    setIsEditModalOpen(true);
   };
 
-  const hasActiveFilters = selectedBanks.length > 0 || selectedCategories.length > 0;
-
+  const onDeleteClick = (transaction: Transaction) => {
+    console.log('Delete clicked for transaction:', transaction);
+    setTransactionToDelete(transaction);
+    setIsDeleteModalOpen(true);
+  };
+  const hasActiveFilters = selectedBanks.length > 0 || selectedCategories.length > 0 || selectedTypes.length > 0;
   return (
     <Card className="border dark:border-gray-800">
       <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-2 space-y-3 sm:space-y-0">
         <div>
-          <CardTitle>Transactions & Analysis</CardTitle>
-          <CardDescription>Manage and analyze your financial activities</CardDescription>
+          <CardTitle>Financial Dashboard</CardTitle>
+          <CardDescription>Track your spending, manage bank accounts, and analyze your financial patterns</CardDescription>
         </div>
         <div className="flex items-start sm:items-center gap-2 w-full sm:w-auto flex-wrap">
-          <Select
-            value={selectedPeriod}
-            onValueChange={setSelectedPeriod}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select period" />
-            </SelectTrigger>
-            <SelectContent>
-              {availablePeriods.map((period) => (
-                <SelectItem key={period.value} value={period.value}>
-                  {period.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
+
+
           {activeTab === 'list' && (
             <>
+
               <Button
                 variant="outline"
                 size="sm"
@@ -228,7 +250,6 @@ export default function TransactionDashboard({
                   </Badge>
                 )}
               </Button>
-              
               <Select
                 value={sortBy}
                 onValueChange={(value) => setSortBy(value as 'date' | 'amount' | 'description' | 'category')}
@@ -243,7 +264,7 @@ export default function TransactionDashboard({
                   <SelectItem value="category">Category</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Button
                 variant="outline"
                 size="sm"
@@ -252,6 +273,7 @@ export default function TransactionDashboard({
               >
                 {sortOrder === 'asc' ? '↑' : '↓'}
               </Button>
+
             </>
           )}
         </div>
@@ -283,181 +305,266 @@ export default function TransactionDashboard({
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="mb-4 p-4 border rounded-lg bg-muted/50 space-y-4"
+                  className="mb-4 p-6 border rounded-lg bg-muted/50 space-y-6"
                 >
                   <div className="flex items-center justify-between">
-                    <h4 className="font-medium">Filter Transactions</h4>
+                    <h4 className="font-semibold text-lg">Filter Transactions</h4>
                     <div className="flex items-center gap-2">
-                      {hasActiveFilters && (
+                      <Button
+                        variant="ghost"
+                        size="lg"
+                        onClick={() => setShowFilters(false)}
+                        className="text-white hover:text-gray-300 p-3"
+                      >
+                        <X className="h-8 w-8" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Bank Filter - Dropdown Style */}
+                    <div className="space-y-3">
+                      <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+                        <Building2 className="h-4 w-4 mr-2" />
+                        Bank Accounts
+                      </h5>
+                      <Popover open={isBankFilterOpen} onOpenChange={setIsBankFilterOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between text-left font-normal"
+                          >
+                            {selectedBanks.length === 0
+                              ? "All Banks"
+                              : selectedBanks.length === 1
+                                ? selectedBanks[0]
+                                : `${selectedBanks.length} banks selected`
+                            }
+                            <Building2 className="h-4 w-4 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 p-0" align="start">
+                          <div className="p-4">
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-medium">Select Banks</h4>
+                                {selectedBanks.length > 0 && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSelectedBanks([])}
+                                    className="text-xs text-white hover:text-gray-300"
+                                  >
+                                    Clear All
+                                  </Button>
+                                )}
+                              </div>
+                              <div className="space-y-2 max-h-48 overflow-y-auto">
+                                {availableBanks.length > 0 ? (
+                                  availableBanks.map((bank) => (
+                                    <div
+                                      key={bank}
+                                      className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${selectedBanks.includes(bank)
+                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                                        : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                                        }`}
+                                      onClick={() => toggleBankFilter(bank)}
+                                    >
+                                      <span className="text-sm font-medium">{bank}</span>
+                                      <span className="text-xs text-white bg-gray-600 dark:bg-gray-700 px-2 py-1 rounded-full">
+                                        {bank === 'No Bank'
+                                          ? transactions.filter(t => t.is_manual_created && !t.bank_info?.institution_name).length
+                                          : transactions.filter(t => t.bank_info?.institution_name === bank).length
+                                        }
+                                      </span>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p className="text-sm text-gray-500 italic">No bank accounts found</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Category Filter - Dropdown Style */}
+                    <div className="space-y-3">
+                      <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+                        <Tag className="h-4 w-4 mr-2" />
+                        Categories
+                      </h5>
+                      <Popover open={isCategoryFilterOpen} onOpenChange={setIsCategoryFilterOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between text-left font-normal"
+                          >
+                            {selectedCategories.length === 0
+                              ? "All Categories"
+                              : selectedCategories.length === 1
+                                ? categories.find(c => c.id === selectedCategories[0])?.name || "Selected"
+                                : `${selectedCategories.length} categories selected`
+                            }
+                            <Tag className="h-4 w-4 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 p-0" align="start">
+                          <div className="p-4">
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-medium">Select Categories</h4>
+                                {selectedCategories.length > 0 && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSelectedCategories([])}
+                                    className="text-xs text-white hover:text-gray-300"
+                                  >
+                                    Clear All
+                                  </Button>
+                                )}
+                              </div>
+                              <div className="space-y-2 max-h-48 overflow-y-auto">
+                                {availableCategories.length > 0 ? (
+                                  availableCategories.map((category) => (
+                                    <div
+                                      key={category.id}
+                                      className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${selectedCategories.includes(category.id)
+                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                                        : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                                        }`}
+                                      onClick={() => toggleCategoryFilter(category.id)}
+                                    >
+                                      <div className="flex items-center space-x-2">
+                                        <div
+                                          className="w-3 h-3 rounded-full"
+                                          style={{ backgroundColor: category.color }}
+                                        />
+                                        <span className="text-sm font-medium">{category.name}</span>
+                                      </div>
+                                      <span className="text-xs text-white bg-gray-600 dark:bg-gray-700 px-2 py-1 rounded-full">
+                                        {transactions.filter(t => t.category_id === category.id).length}
+                                      </span>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p className="text-sm text-gray-500 italic">No categories found</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    {/* Transaction Type Filter - Dropdown Style */}
+                    <div className="space-y-3">
+                      <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+                        <TrendingUp className="h-4 w-4 mr-2" />
+                        Transaction Type
+                      </h5>
+                      <Popover open={isTypeFilterOpen} onOpenChange={setIsTypeFilterOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between text-left font-normal"
+                          >
+                            {selectedTypes.length === 0
+                              ? "All Types"
+                              : selectedTypes.length === 1
+                                ? selectedTypes[0] === 'income' ? 'Income' : 'Expenses'
+                                : `${selectedTypes.length} types selected`
+                            }
+                            <TrendingUp className="h-4 w-4 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 p-0" align="start">
+                          <div className="p-4">
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-medium">Select Types</h4>
+                                {selectedTypes.length > 0 && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSelectedTypes([])}
+                                    className="text-xs text-blue-600 hover:text-gray-700"
+                                  >
+                                    Clear All
+                                  </Button>
+                                )}
+                              </div>
+                              <div className="space-y-2">
+                                <div
+                                  className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${selectedTypes.includes('income')
+                                    ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                                    : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                                    }`}
+                                  onClick={() => toggleTypeFilter('income')}
+                                >
+                                  <span className="text-sm font-medium">Income</span>
+                                  <span className="text-xs text-white bg-gray-600 dark:bg-gray-700 px-2 py-1 rounded-full">
+                                    {transactions.filter(t => t.type === 'income').length}
+                                  </span>
+                                </div>
+                                <div
+                                  className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${selectedTypes.includes('expense')
+                                    ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+                                    : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+                                    }`}
+                                  onClick={() => toggleTypeFilter('expense')}
+                                >
+                                  <span className="text-sm font-medium">Expenses</span>
+                                  <span className="text-xs text-white bg-gray-600 dark:bg-gray-700 px-2 py-1 rounded-full">
+                                    {transactions.filter(t => t.type === 'expense').length}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  {/* Active Filters Summary */}
+                  {hasActiveFilters && (
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {filteredAndSortedTransactions.length} of {transactions.length} transactions
+                        </span>
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
                           onClick={clearAllFilters}
                           className="text-xs"
                         >
                           Clear All
                         </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowFilters(false)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Bank Filters */}
-                    {availableBanks.length > 0 && (
-                      <div>
-                        <h5 className="text-sm font-medium mb-2">Filter by Bank</h5>
-                        <div className="flex flex-wrap gap-2">
-                          {availableBanks.map((bank) => (
-                            <Button
-                              key={bank}
-                              variant={selectedBanks.includes(bank) ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => toggleBankFilter(bank)}
-                              className="text-xs"
-                            >
-                              {bank}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Category Filters */}
-                    {availableCategories.length > 0 && (
-                      <div>
-                        <h5 className="text-sm font-medium mb-2">Filter by Category</h5>
-                        <div className="flex flex-wrap gap-2">
-                          {availableCategories.map((category) => (
-                            <Button
-                              key={category.id}
-                              variant={selectedCategories.includes(category.id) ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => toggleCategoryFilter(category.id)}
-                              className="text-xs flex items-center gap-1"
-                            >
-                              <div
-                                className="w-2 h-2 rounded-full"
-                                style={{ backgroundColor: category.color }}
-                              />
-                              {category.name}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
-
-            {loading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <TransactionSkeleton key={i} />
-                ))}
-              </div>
-            ) : filteredAndSortedTransactions.length === 0 ? (
-              <div className="text-center py-4">
-                {hasActiveFilters ? (
-                  <div>
-                    <p>No transactions match your current filters.</p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={clearAllFilters}
-                      className="mt-2"
-                    >
-                      Clear Filters
-                    </Button>
-                  </div>
-                ) : selectedPeriod === 'all' ? (
-                  "No transactions found"
-                ) : (
-                  `No transactions found for ${availablePeriods.find(p => p.value === selectedPeriod)?.label}`
-                )}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <AnimatePresence mode="sync" initial={false}>
-                  {filteredAndSortedTransactions.map((transaction) => (
-                    <motion.div
-                      key={transaction.id}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="flex items-center justify-between p-4 border rounded-lg dark:border-gray-800 hover:bg-muted/50 transition-colors group"
-                      style={{ overflow: "hidden" }}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className="w-3 h-3 rounded-full mt-1.5"
-                          style={{ backgroundColor: getCategoryColor(transaction.category_id) }}
-                        />
-                        <div>
-                          <p className="font-medium">{transaction.description}</p>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            {transaction.bank_info && (
-                              <>
-                                <span className="text-blue-600 font-medium">  
-                                  {transaction.bank_info.institution_name} - {transaction.bank_info.account_name}
-                                </span>
-                                <span>:</span>
-                              </>
-                            )}
-                            <span>{getCategoryName(transaction.category_id)}</span>
-                            <span>•</span>
-                            <span>{format(new Date(transaction.date), 'MMM d, yyyy')}</span>
-
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <motion.p
-                          className={`font-medium ${transaction.type === 'income' ? 'text-green-500' : 'text-red-500'
-                            }`}
-                          animate={{ opacity: isRefreshing ? 0.5 : 1 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          {transaction.type === 'income' ? '+' : '-'}${Math.abs(transaction.amount).toFixed(2)}
-                        </motion.p>
-                        {/* <div className="flex gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                            onClick={() => onEditClick(transaction)}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => onDeleteClick(transaction)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div> */}
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            )}
+            <TransactionList
+              transactions={filteredAndSortedTransactions}
+              categories={categories}
+              loading={loading}
+              isRefreshing={isRefreshing}
+              onAddClick={() => setIsAddModalOpen(true)}
+              onEditClick={onEditClick}
+              onDeleteClick={onDeleteClick}
+            />
           </TabsContent>
 
           <TabsContent value="chart" className="mt-4">
             {loading ? (
               <div className="h-[400px]">
-                <Skeleton className="h-full w-full rounded-lg" />
+                <div className="h-full w-full rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse" />
               </div>
             ) : (
               <SpendingChart
@@ -471,10 +578,59 @@ export default function TransactionDashboard({
           </TabsContent>
 
           <TabsContent value="bank-accounts" className="mt-4">
-            <BankAccounts onRefresh={onRefreshTransactions} />
+            <BankAccounts onRefresh={onRefreshTransactions} availablePeriods={availablePeriods} selectedPeriod={selectedPeriod} onPeriodChange={setSelectedPeriod} />
           </TabsContent>
         </Tabs>
       </CardContent>
+      <AddTransactionModal
+        isOpen={isAddModalOpen}
+        onClose={() => {
+          setIsAddModalOpen(false);
+        }}
+        onAddTransaction={(transactionData) => {
+          if (onCreateTransaction) {
+            onCreateTransaction(transactionData);
+          }
+          setIsAddModalOpen(false);
+        }}
+        categories={categories}
+      />
+      {selectedTransaction && (
+        <EditTransactionModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedTransaction(null);
+          }}
+          onEditTransaction={(updatedTransaction) => {
+            if (onUpdateTransaction) {
+              onUpdateTransaction(updatedTransaction);
+            }
+            setIsEditModalOpen(false);
+            setSelectedTransaction(null);
+          }}
+          transaction={selectedTransaction}
+          categories={categories}
+        />
+      )}
+
+      {transactionToDelete && (
+        <DeleteTransactionDialog
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setTransactionToDelete(null);
+          }}
+          onConfirm={() => {
+            if (onDeleteTransaction && transactionToDelete) {
+              onDeleteTransaction(transactionToDelete.id);
+            }
+            setIsDeleteModalOpen(false);
+            setTransactionToDelete(null);
+          }}
+          transaction={transactionToDelete}
+        />
+      )}
     </Card>
   );
 } 

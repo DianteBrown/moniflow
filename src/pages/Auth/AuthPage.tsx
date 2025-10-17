@@ -10,6 +10,7 @@ import { authService } from "@/services/authService";
 import { toast } from "sonner";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
+import { googleAuthService } from '../../services/googleAuthService';
 
 // Login form as a separate component
 function LoginForm() {
@@ -17,6 +18,19 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const initGoogleAuth = async () => {
+      try {
+        await googleAuthService.initialize();
+        googleAuthService.renderButton('google-signin-button');
+      } catch (error) {
+        console.error('Failed to initialize Google Auth:', error);
+      }
+    };
+
+    initGoogleAuth();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,18 +126,80 @@ function LoginForm() {
       <Button type="submit" className="w-full bg-[#184A47] hover:bg-[#123a38]" disabled={isLoading}>
         {isLoading ? 'Signing in...' : 'Sign in'}
       </Button>
+      <div className="mt-6">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
+          </div>
+        </div>
+
+        <div className="mt-6 justify-center items-center" >
+          <div id="google-signin-button" className="justify-center items-center flex w-full"></div>
+        </div>
+      </div>
     </form>
   );
 }
 
 // Register form as a separate component
 function RegisterForm() {
-  const [name, setName] = useState("");
+  const [name, setName] = useState(""); 
   const [email, setEmail] = useState("");
+  const [phone_number, setPhone_number] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [phoneBlurred, setPhoneBlurred] = useState(false);
+
+  useEffect(() => {
+    const initGoogleAuth = async () => {
+      try {
+        await googleAuthService.initialize();
+        googleAuthService.renderButton('google-signin-button-register');
+      } catch (error) {
+        console.error('Failed to initialize Google Auth:', error);
+      }
+    };
+
+    initGoogleAuth();
+  }, []);
+
+  const formatPhoneNumber = (value: string): string => {
+    // Remove all non-digit characters
+    const phoneNumber = value.replace(/\D/g, '').replace(/^1/, '');
+
+    // Format for US/Canada: +1 (XXX) XXX-XXXX
+    if (phoneNumber.length === 0) {
+      return '';
+    } else if (phoneNumber.length <= 3) {
+      return `+1 (${phoneNumber}`;
+    } else if (phoneNumber.length <= 6) {
+      return `+1 (${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    } else {
+      return `+1 (${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+    }
+  };
+
+  const validatePhoneNumber = (phone: string): boolean => {
+    // US/Canada phone number validation
+    // Must be exactly 10 digits (excluding formatting)
+    // Format: (XXX) XXX-XXXX
+    const cleanPhone = phone.replace(/\D/g, '');
+    return cleanPhone.length === 10 && /^[2-9]\d{2}[2-9]\d{6}$/.test(cleanPhone);
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setPhone_number(formatted);
+  };
+
+  const handlePhoneBlur = () => {
+    setPhoneBlurred(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,10 +212,17 @@ function RegisterForm() {
       return;
     }
 
+    if (!validatePhoneNumber(phone_number)) {
+      setErrorMessage('Please enter a valid US/Canada phone number (e.g., +1 (555) 123-4567)');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await authService.register({
         name,
         email,
+        phone_number,
         password,
       });
 
@@ -199,8 +282,37 @@ function RegisterForm() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          autoComplete="name"
           className="dark:text-foreground"
         />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="phone_number">Phone Number</Label>
+        <div className="relative">
+          <Input
+            id="phone_number"
+            type="tel"
+            placeholder="+1 (555) 123-4567"
+            value={phone_number}
+            onChange={handlePhoneChange}
+            onBlur={handlePhoneBlur}
+            required
+            className={`dark:text-foreground ${phoneBlurred && phone_number && !validatePhoneNumber(phone_number)
+              ? 'border-red-500 focus:border-red-500'
+              : ''
+              }`}
+          />
+          {phoneBlurred && phone_number && !validatePhoneNumber(phone_number) && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+          )}
+        </div>
+        {phoneBlurred && phone_number && !validatePhoneNumber(phone_number) && (
+          <p className="text-sm text-red-500">Please enter a valid US/Canada phone number (e.g., +1 (555) 123-4567)</p>
+        )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="email-register">Email</Label>
@@ -214,6 +326,34 @@ function RegisterForm() {
           autoComplete="email"
           className="dark:text-foreground"
         />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="phone_number">Phone Number</Label>
+        <div className="relative">
+          <Input
+            id="phone_number"
+            type="tel"
+            placeholder="(555) 123-4567"
+            value={phone_number}
+            onChange={handlePhoneChange}
+            onBlur={handlePhoneBlur}
+            required
+            className={`dark:text-foreground ${phoneBlurred && phone_number && !validatePhoneNumber(phone_number)
+              ? 'border-red-500 focus:border-red-500'
+              : ''
+              }`}
+          />
+          {phoneBlurred && phone_number && !validatePhoneNumber(phone_number) && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+          )}
+        </div>
+        {phoneBlurred && phone_number && !validatePhoneNumber(phone_number) && (
+          <p className="text-sm text-red-500">Please enter a valid US/Canada phone number (e.g., (555) 123-4567)</p>
+        )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="password-register">Password</Label>
@@ -244,6 +384,20 @@ function RegisterForm() {
       <Button type="submit" className="w-full bg-[#184A47] hover:bg-[#123a38]" disabled={isLoading}>
         {isLoading ? 'Creating account...' : 'Create account'}
       </Button>
+      <div className="mt-6">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
+          </div>
+        </div>
+
+        <div className="mt-6 justify-center items-center" >
+          <div id="google-signin-button-register" className="justify-center items-center flex w-full"></div>
+        </div>
+      </div>
     </form>
   );
 }
@@ -288,7 +442,7 @@ const AuthPage = () => {
               <p className="text-lg text-[#184A47] dark:text-gray-300 mb-6 font-poppins">
                 {activeView === "login"
                   ? "Sign in to your account to manage your finances and track your budget with ease."
-                  : "Create an account to start tracking your expenses, setting budgets, and achieving your financial goals."
+                  : "Create an account to start tracking your expenses, setting budgets, and achieving your financial goals. Your data is encrypted and secure."
                 }
               </p>
 
@@ -355,8 +509,8 @@ const AuthPage = () => {
               <div className="mb-6 flex border dark:border-gray-700 rounded-lg overflow-hidden">
                 <button
                   className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${activeView === 'login'
-                      ? 'bg-[#184A47] text-white'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-[#184A47] text-white'
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   onClick={() => setActiveView('login')}
                 >
@@ -364,8 +518,8 @@ const AuthPage = () => {
                 </button>
                 <button
                   className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${activeView === 'register'
-                      ? 'bg-[#184A47] text-white'
-                      : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-[#184A47] text-white'
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   onClick={() => setActiveView('register')}
                 >
