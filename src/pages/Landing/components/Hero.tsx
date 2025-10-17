@@ -5,10 +5,10 @@ const Hero = () => {
       <div className="hero-container">
         <div className="hero-content">
           <h1 className="hero-title">
-            Manage your finances in one place
+            Take control of your money with Moniflow
           </h1>
           <p className="hero-subtitle">
-            Take control of your finances with our easy to use platform.
+            Monitor spending, plan budgets, and receive AI-driven insights to achieve your financial goals.
           </p>
         </div>
       </div>

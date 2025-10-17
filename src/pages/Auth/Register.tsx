@@ -11,6 +11,7 @@ import { Loader2 } from "lucide-react";
 interface RegisterFormData {
   name: string;
   email: string;
+  phone_number: string;
   password: string;
   confirmPassword: string;
 }
@@ -20,10 +21,21 @@ const Register = () => {
   const [formData, setFormData] = useState<RegisterFormData>({
     name: '',
     email: '',
+    phone_number: '',
     password: '',
     confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
+
+  const validatePhoneNumber = (phone: string): boolean => {
+    // International phone number validation
+    // Must start with + followed by country code
+    // Must contain 10-15 digits total (excluding separators)
+    // Allows spaces, dashes, and parentheses as separators
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+    return phoneRegex.test(cleanPhone);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,10 +57,17 @@ const Register = () => {
       return;
     }
 
+    if (!validatePhoneNumber(formData.phone_number)) {
+      toast.error('Please enter a valid international phone number (e.g., +1 555-123-4567)');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await authService.register({
         name: formData.name,
         email: formData.email,
+        phone_number: formData.phone_number,
         password: formData.password,
       });
       authService.setToken(response.token);
@@ -101,6 +120,20 @@ const Register = () => {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="phone_number">Phone Number</Label>
+              <Input
+                id="phone_number"
+                name="phone_number"
+                type="tel"
+                placeholder="+1 555-123-4567"
+                required
+                disabled={loading}
+                value={formData.phone_number}
+                onChange={handleChange}
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -134,7 +167,7 @@ const Register = () => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
+                  //Creating account...
                 </>
               ) : (
                 "Create account"

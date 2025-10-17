@@ -4,7 +4,7 @@ const GetStarted = ({ onGetStarted }: { onGetStarted: () => void }) => {
     return (
       <section className="get-started-section">
         <div className="get-started-container">
-          <Button onClick={onGetStarted} className="get-started-button">Get Started</Button>
+          <Button onClick={onGetStarted} className="get-started-button">Get Started Free</Button>
         </div>
       </section>
     );

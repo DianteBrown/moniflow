@@ -8,6 +8,7 @@ export interface Transaction {
   category_id: string;
   date: string;
   type: 'income' | 'expense';
+  is_manual_created?: boolean;
   bank_info?: {
     institution_name: string;
     account_name: string;

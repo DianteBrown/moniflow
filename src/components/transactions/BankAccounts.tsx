@@ -7,7 +7,7 @@ import { transactionKeys } from '@/hooks/queries/useTransactions';
 import { categoryKeys } from '@/hooks/queries/useCategories';
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 // Simple inline Badge component
 const Badge = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${className}`}>
@@ -31,6 +31,9 @@ import { useQueryClient } from "@tanstack/react-query";
 
 interface BankAccountsProps {
   onRefresh?: () => void;
+  availablePeriods: { value: string; label: string }[];
+  selectedPeriod: string;
+  onPeriodChange: (period: string) => void;
 }
 
 const BankAccountSkeleton = () => (
@@ -201,7 +204,7 @@ const BankCard = ({ bank }: {
   );
 };
 
-export default function BankAccounts({ onRefresh }: BankAccountsProps) {
+export default function BankAccounts({ onRefresh, availablePeriods, selectedPeriod, onPeriodChange }: BankAccountsProps) {
   const [banks, setBanks] = useState<ConnectedBank[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -209,6 +212,7 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const queryClient = useQueryClient();
+
   const fetchBanks = async () => {
     try {
       setLoading(true);
@@ -229,7 +233,7 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
       console.log('Plaid connection already in progress');
       return;
     }
-    
+
     try {
       setIsLoading(true);
       console.log('Creating link token...');
@@ -240,6 +244,7 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
       console.error('Error creating link token:', error);
       toast.error('Failed to initialize Plaid connection');
       setIsLoading(false);
+      setLinkToken(null); // Reset link token on error
     }
   };
 
@@ -252,16 +257,31 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
       console.log('Exchange response:', response);
 
       toast.success('Bank account connected successfully!');
+
       setLinkToken(null);
       setIsLoading(false);
 
       // Start syncing transactions
       await syncPlaidTransactions();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error exchanging public token:', error);
-      toast.error('Failed to connect bank account');
+
+      // Handle specific error cases
+      if (error.response?.status === 400 && error.response?.data?.message) {
+        const errorMessage = error.response.data.message;
+
+        if (errorMessage === 'This account is already connected') {
+          toast.error('This account is already connected. Please try connecting a different account.');
+        } else {
+          console.log(`Failed to connect bank account: ${errorMessage}`);
+        }
+      } else {
+        console.log('Failed to connect bank account. Please try again.');
+      }
+
       setIsLoading(false);
+      setLinkToken(null); // Reset link token on error
     }
   };
 
@@ -276,6 +296,7 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
 
       // Count the number of transactions synced
       const totalSynced = syncResult.results?.reduce((total: number, result: any) => total + (result.added || 0), 0) || 0;
+      console.log('Total synced:', totalSynced, 'Results:', syncResult.results);
 
       // Invalidate and refetch transactions to show the new ones
       await queryClient.invalidateQueries({
@@ -293,15 +314,16 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
       // Notify parent component to refresh
       onRefresh?.();
 
-      if (totalSynced > 0) {
-        toast.success(`Successfully synced ${totalSynced} transactions!`, {
-          id: 'sync-transactions'
-        });
-      } else {
-        toast.success('Bank account connected! No new transactions to sync.', {
-          id: 'sync-transactions'
-        });
-      }
+      // if (totalSynced > 0) {
+      //   toast.success(`Successfully synced ${totalSynced} transactions!`, {
+      //     id: 'sync-transactions'
+      //   });
+      // } else {
+      //   toast.success('Bank account connected! No new transactions to sync.', {
+      //     id: 'sync-transactions'
+      //   });
+      // }
+      toast.success('Successfully synced transactions!');
 
     } catch (error) {
       toast.error('Failed to sync transactions from bank', {
@@ -316,7 +338,7 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
     console.log('Plaid Link Exit:', { error, metadata });
     console.log('Exit reason:', error?.error_code || 'No error code');
     console.log('Metadata:', metadata);
-    
+
     if (error) {
       console.error('Plaid Link error:', error);
       // Provide more specific error messages
@@ -336,11 +358,28 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
     setLinkToken(null);
     setIsLoading(false);
   };
-
-  const { open, ready } = usePlaidLink({
+  const config = {
     token: linkToken,
-    onSuccess: onPlaidSuccess,
-    onExit: onPlaidExit,
+    onSuccess: async (publicToken: string, metadata: any) => {
+      // Handle successful connection
+      console.log('Bank connected successfully:', metadata);
+      // Call your backend to exchange the public token
+      const response = await plaidService.exchangePublicToken(publicToken, metadata.institution?.institution_id);
+      console.log('Exchange response:', response);
+    },
+    onExit: (err: any) => {
+      // Handle user exit or errors
+      if (err) {
+        console.error('Plaid Link error:', err);
+      }
+    },
+    // Add this for OAuth support
+    receivedRedirectUri: window.location.href.includes('/oauth/plaid/callback')
+      ? window.location.href
+      : undefined,
+  };
+  const { open, ready } = usePlaidLink({
+    ...config
   });
   useEffect(() => {
     if (linkToken && ready) {
@@ -433,19 +472,36 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
 
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Connected Bank Accounts</h3>
+          <h3 className="text-lg font-semibold">Bank Account Management</h3>
           <p className="text-sm text-muted-foreground">
-            Manage your connected financial institutions
+            Connect and manage your bank accounts for automatic transaction import
           </p>
         </div>
-        <Button
-          className="items-center gap-2"
-          onClick={handlePlaid}
-          disabled={isLoading || isSyncing}
-        >
-          <CreditCard className="h-4 w-4" />
-          {isLoading ? 'Connecting...' : isSyncing ? 'Syncing...' : 'Connect Bank'}
-        </Button>
+        <div className="flex items-center gap-3">
+          <Select
+            value={selectedPeriod}
+            onValueChange={onPeriodChange}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent>
+              {availablePeriods.map((period) => (
+                <SelectItem key={period.value} value={period.value}>
+                  {period.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            className="items-center gap-2"
+            onClick={handlePlaid}
+            disabled={isLoading || isSyncing}
+          >
+            <CreditCard className="h-4 w-4" />
+            {isLoading ? 'Connecting...' : isSyncing ? 'Syncing...' : 'Connect Bank'}
+          </Button>
+        </div>
       </div>
 
       {banks.length === 0 ? (
@@ -454,7 +510,7 @@ export default function BankAccounts({ onRefresh }: BankAccountsProps) {
             <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
             <CardTitle className="text-lg mb-2">No Bank Accounts Connected</CardTitle>
             <CardDescription className="text-center mb-4">
-              Connect your bank accounts to automatically import transactions and track your finances.
+              Get started by connecting your bank accounts to automatically import and categorize your transactions.
             </CardDescription>
 
           </CardContent>

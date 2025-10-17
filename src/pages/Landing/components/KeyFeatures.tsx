@@ -4,27 +4,27 @@ const KeyFeatures = () => {
     {
       icon: "/assets/images/Track Spending.png",
       title: "Track Spending",
-      description: "Monitor of your expenses in one-place",
+      description: "Monitor your expenses in one place with real-time transaction tracking",
     },
     {
       icon: "/assets/images/Set Goals.png",
       title: "Set Goals",
-      description: "Define financial forgers anchiove triem",
+      description: "Define your financial future with intelligent budgeting and savings goals",
     },
     {
       icon: "/assets/images/Analyze Trends.png",
       title: "Analyze Trends",
-      description: "Gain insights, with detailed expense reports",
+      description: "Gain insights with detailed expense reports and spending analytics",
     },
     {
       icon: "/assets/images/Secure Cloud.png",
       title: "Secure Cloud Storage",
-      description: "Profied your data with noursiny leading security",
+      description: "Protect your data with industry-leading security and encryption",
     },
   ];
 
   return (
-    <section className="py-20 bg-[var(--gray-background)]">
+    <section id="features" className="py-20 bg-[var(--gray-background)]">
       <div className="mx-auto max-w-7xl px-4">
         <div className="text-center mb-16">
           <h2 className="text-xl md:text-4xl font-bold text-[#ffffff] tracking-widest uppercase mb-3">Features</h2>

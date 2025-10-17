@@ -6,7 +6,7 @@ interface HeaderProps {
   onGetStarted: () => void;
 }
 
-const Header = ({ onSignIn }: HeaderProps) => {
+const Header = ({ onSignIn, onGetStarted }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -24,12 +24,26 @@ const Header = ({ onSignIn }: HeaderProps) => {
     document.body.classList.toggle("menu-open");
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className={`header ${scrolled ? "shadow-md" : ""}`}>
       <div className="header-container">
         <Link to="/" className="logo">
           <span>Moniflow</span>
         </Link>
+        
+        {/* Desktop Navigation */}
+        <nav className="desktop-nav">
+          <button onClick={() => scrollToSection('features')} className="nav-link">Features</button>
+          <button onClick={() => scrollToSection('about')} className="nav-link">About</button>
+        </nav>
         
         <button 
           className="menu-toggle"
@@ -48,10 +62,22 @@ const Header = ({ onSignIn }: HeaderProps) => {
             onClick={onSignIn} 
             className="signin"
           >
-            Login/Sign in
+            Sign In
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="mobile-menu">
+          <nav className="mobile-nav">
+            <button onClick={() => scrollToSection('features')} className="mobile-nav-link">Features</button>
+            <button onClick={() => scrollToSection('about')} className="mobile-nav-link">About</button>
+            <button onClick={onGetStarted} className="mobile-nav-link">Get Started</button>
+            <button onClick={onSignIn} className="mobile-nav-link">Sign In</button>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

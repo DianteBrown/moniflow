@@ -3,9 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://github.com/DianteBrown/moniflow.git",
+  "homepage": "https://github.com/ccook0194/moniflow-budget-app-frontend.git",
   "scripts": {
-    "dev": "vite --host=127.0.0.1",
+    "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

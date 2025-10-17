@@ -116,7 +116,8 @@ export const categoryIcons: CategoryIcon[] = [
   { id: 'trophy', icon: FaTrophy, label: 'Sports', suggestedType: 'expense' },
   { id: 'ticket', icon: FaTicketAlt, label: 'Events & Tickets', suggestedType: 'expense' },
   { id: 'wallet', icon: FaWallet, label: 'Wallet', suggestedType: 'both' },
-  { id: 'lightbulb', icon: FaLightbulb, label: 'Utilities', suggestedType: 'expense' }
+  { id: 'lightbulb', icon: FaLightbulb, label: 'Utilities', suggestedType: 'expense' },
+  { id: 'tag', icon: MdShoppingCart, label: 'General', suggestedType: 'both' }
 ];
 
 // Helper function to get icon by ID
