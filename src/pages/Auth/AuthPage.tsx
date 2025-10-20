@@ -40,10 +40,6 @@ function LoginForm() {
     try {
       const response = await authService.login({ email, password });
 
-      // Log the response and token
-      console.log('Login response:', response);
-      console.log('Token after login:', localStorage.getItem('token'));
-
       // Successfully logged in and token stored
       toast.success('Login successful!');
 
@@ -146,7 +142,7 @@ function LoginForm() {
 
 // Register form as a separate component
 function RegisterForm() {
-  const [name, setName] = useState(""); 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone_number, setPhone_number] = useState("");
   const [password, setPassword] = useState("");
@@ -185,11 +181,13 @@ function RegisterForm() {
   };
 
   const validatePhoneNumber = (phone: string): boolean => {
-    // US/Canada phone number validation
-    // Must be exactly 10 digits (excluding formatting)
-    // Format: (XXX) XXX-XXXX
+    // US/Canada phone number validation with +1 prefix
+    // Must be exactly 10 digits (excluding formatting and +1 prefix)
+    // Format: +1 (XXX) XXX-XXXX
     const cleanPhone = phone.replace(/\D/g, '');
-    return cleanPhone.length === 10 && /^[2-9]\d{2}[2-9]\d{6}$/.test(cleanPhone);
+    // Remove the '1' prefix if it exists (from +1)
+    const phoneDigits = cleanPhone.startsWith('1') ? cleanPhone.slice(1) : cleanPhone;
+    return phoneDigits.length === 10 && /^[2-9]\d{2}[2-9]\d{6}$/.test(phoneDigits);
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -299,7 +297,9 @@ function RegisterForm() {
             required
             className={`dark:text-foreground ${phoneBlurred && phone_number && !validatePhoneNumber(phone_number)
               ? 'border-red-500 focus:border-red-500'
-              : ''
+              : phone_number && !validatePhoneNumber(phone_number)
+                ? 'border-yellow-500 focus:border-yellow-500'
+                : ''
               }`}
           />
           {phoneBlurred && phone_number && !validatePhoneNumber(phone_number) && (
@@ -310,8 +310,13 @@ function RegisterForm() {
             </div>
           )}
         </div>
-        {phoneBlurred && phone_number && !validatePhoneNumber(phone_number) && (
-          <p className="text-sm text-red-500">Please enter a valid US/Canada phone number (e.g., +1 (555) 123-4567)</p>
+        {phone_number && !validatePhoneNumber(phone_number) && (
+          <p className={`text-sm ${phoneBlurred ? 'text-red-500' : 'text-yellow-600'}`}>
+            {phoneBlurred
+              ? 'Please enter a valid US/Canada phone number (e.g., +1 (555) 123-4567)'
+              : 'Enter a valid US/Canada phone number'
+            }
+          </p>
         )}
       </div>
       <div className="space-y-2">
@@ -327,34 +332,7 @@ function RegisterForm() {
           className="dark:text-foreground"
         />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="phone_number">Phone Number</Label>
-        <div className="relative">
-          <Input
-            id="phone_number"
-            type="tel"
-            placeholder="(555) 123-4567"
-            value={phone_number}
-            onChange={handlePhoneChange}
-            onBlur={handlePhoneBlur}
-            required
-            className={`dark:text-foreground ${phoneBlurred && phone_number && !validatePhoneNumber(phone_number)
-              ? 'border-red-500 focus:border-red-500'
-              : ''
-              }`}
-          />
-          {phoneBlurred && phone_number && !validatePhoneNumber(phone_number) && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-          )}
-        </div>
-        {phoneBlurred && phone_number && !validatePhoneNumber(phone_number) && (
-          <p className="text-sm text-red-500">Please enter a valid US/Canada phone number (e.g., (555) 123-4567)</p>
-        )}
-      </div>
+
       <div className="space-y-2">
         <Label htmlFor="password-register">Password</Label>
         <Input
