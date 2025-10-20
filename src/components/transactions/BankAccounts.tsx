@@ -470,19 +470,19 @@ export default function BankAccounts({ onRefresh, availablePeriods, selectedPeri
         </div>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold">Bank Account Management</h3>
           <p className="text-sm text-muted-foreground">
             Connect and manage your bank accounts for automatic transaction import
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <Select
             value={selectedPeriod}
             onValueChange={onPeriodChange}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Select period" />
             </SelectTrigger>
             <SelectContent>
@@ -494,7 +494,7 @@ export default function BankAccounts({ onRefresh, availablePeriods, selectedPeri
             </SelectContent>
           </Select>
           <Button
-            className="items-center gap-2"
+            className="items-center gap-2 w-full sm:w-auto"
             onClick={handlePlaid}
             disabled={isLoading || isSyncing}
           >

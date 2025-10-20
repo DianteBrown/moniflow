@@ -162,4 +162,30 @@
   .rdp-day_today {
     font-weight: bold;
   }
+
+  /* Force transparent scrollbar track for AI Chat */
+  .ai-chat-messages::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .ai-chat-messages::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .ai-chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.5) !important;
+    border-radius: 3px;
+  }
+
+  .ai-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.7) !important;
+  }
+
+  .dark .ai-chat-messages::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.5) !important;
+  }
+
+  .dark .ai-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(75, 85, 99, 0.7) !important;
+  }
 }
