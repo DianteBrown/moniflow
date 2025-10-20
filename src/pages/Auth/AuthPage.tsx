@@ -81,12 +81,12 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {errorMessage && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-md">
-          <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
+        <div className="mb-4 p-3 bg-red-900/20 border border-red-800 rounded-md">
+          <p className="text-sm text-red-400">{errorMessage}</p>
         </div>
       )}
       <div className="space-y-2">
-        <Label htmlFor="email-login">Email</Label>
+        <Label htmlFor="email-login" className="text-white">Email</Label>
         <Input
           id="email-login"
           type="email"
@@ -95,15 +95,15 @@ function LoginForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="email"
-          className="dark:text-foreground"
+          className="text-white"
         />
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="password-login">Password</Label>
+          <Label htmlFor="password-login" className="text-white">Password</Label>
           <Link
             to="/forgot-password"
-            className="text-sm font-medium text-primary hover:text-primary/80 dark:text-primary dark:hover:text-primary/80"
+            className="text-sm font-medium text-[#00A533] hover:text-[#00A533]/80"
           >
             Forgot password?
           </Link>
@@ -116,7 +116,7 @@ function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="current-password"
-          className="dark:text-foreground"
+          className="text-white"
         />
       </div>
       <Button type="submit" className="w-full bg-[#184A47] hover:bg-[#123a38]" disabled={isLoading}>
@@ -125,10 +125,10 @@ function LoginForm() {
       <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
+            <div className="w-full border-t border-gray-700" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
+            <span className="px-2 bg-[#060609] text-white">Or continue with</span>
           </div>
         </div>
 
@@ -272,7 +272,7 @@ function RegisterForm() {
         </div>
       )}
       <div className="space-y-2">
-        <Label htmlFor="name">Full Name</Label>
+        <Label htmlFor="name" className="text-white">Full Name</Label>
         <Input
           id="name"
           type="text"
@@ -281,11 +281,11 @@ function RegisterForm() {
           onChange={(e) => setName(e.target.value)}
           required
           autoComplete="name"
-          className="dark:text-foreground"
+          className="text-white"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phone_number">Phone Number</Label>
+        <Label htmlFor="phone_number" className="text-white">Phone Number</Label>
         <div className="relative">
           <Input
             id="phone_number"
@@ -295,7 +295,7 @@ function RegisterForm() {
             onChange={handlePhoneChange}
             onBlur={handlePhoneBlur}
             required
-            className={`dark:text-foreground ${phoneBlurred && phone_number && !validatePhoneNumber(phone_number)
+            className={`text-white ${phoneBlurred && phone_number && !validatePhoneNumber(phone_number)
               ? 'border-red-500 focus:border-red-500'
               : phone_number && !validatePhoneNumber(phone_number)
                 ? 'border-yellow-500 focus:border-yellow-500'
@@ -320,7 +320,7 @@ function RegisterForm() {
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email-register">Email</Label>
+        <Label htmlFor="email-register" className="text-white">Email</Label>
         <Input
           id="email-register"
           type="email"
@@ -329,12 +329,12 @@ function RegisterForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="email"
-          className="dark:text-foreground"
+          className="text-white"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password-register">Password</Label>
+        <Label htmlFor="password-register" className="text-white">Password</Label>
         <Input
           id="password-register"
           type="password"
@@ -343,11 +343,11 @@ function RegisterForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="new-password"
-          className="dark:text-foreground"
+          className="text-white"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="confirm-password">Confirm Password</Label>
+        <Label htmlFor="confirm-password" className="text-white">Confirm Password</Label>
         <Input
           id="confirm-password"
           type="password"
@@ -356,7 +356,7 @@ function RegisterForm() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
           autoComplete="new-password"
-          className="dark:text-foreground"
+          className="text-white"
         />
       </div>
       <Button type="submit" className="w-full bg-[#184A47] hover:bg-[#123a38]" disabled={isLoading}>
@@ -394,11 +394,11 @@ const AuthPage = () => {
   }, [location]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#DDE9E8] dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col bg-[#060609]">
       {/* Header */}
-      <header className="fixed top-0 left-0 w-full bg-[#DDE9E8] dark:bg-gray-900 p-4 z-10 shadow-sm dark:shadow-gray-800">
+      <header className="fixed top-0 left-0 w-full bg-black p-4 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2 font-semibold text-[#184A47] dark:text-white">
+          <Link to="/" className="flex items-center gap-2 font-semibold text-white">
             <img src="/assets/images/moniflow-logo.svg" alt="Moniflow Logo" height="28" width="28" />
             <span className="text-xl font-sora">Moniflow</span>
           </Link>
@@ -411,13 +411,13 @@ const AuthPage = () => {
           <div className="grid md:grid-cols-2 gap-8 items-start">
             {/* Left side - Hero text */}
             <div className="flex flex-col justify-center p-6">
-              <h1 className="text-4xl font-bold text-[#184A47] dark:text-white mb-4 font-montserrat">
+              <h1 className="text-4xl font-bold text-white mb-4 font-montserrat">
                 {activeView === "login"
                   ? "Welcome back!"
                   : "Start your financial journey"
                 }
               </h1>
-              <p className="text-lg text-[#184A47] dark:text-gray-300 mb-6 font-poppins">
+              <p className="text-lg text-white mb-6 font-poppins">
                 {activeView === "login"
                   ? "Sign in to your account to manage your finances and track your budget with ease."
                   : "Create an account to start tracking your expenses, setting budgets, and achieving your financial goals. Your data is encrypted and secure."
@@ -425,8 +425,8 @@ const AuthPage = () => {
               </p>
 
               {/* Benefits section instead of screenshot */}
-              <div className="bg-white/80 dark:bg-gray-800 rounded-xl p-6 border border-[#184A47]/10 dark:border-gray-700 shadow-md">
-                <h3 className="text-xl font-semibold text-[#184A47] dark:text-white mb-4 font-montserrat">
+              <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-md">
+                <h3 className="text-xl font-semibold text-white mb-4 font-montserrat">
                   {activeView === "login"
                     ? "Your financial dashboard awaits"
                     : "Join thousands already saving money"
@@ -438,37 +438,37 @@ const AuthPage = () => {
                     <svg className="h-6 w-6 text-[#184A47] dark:text-green-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-gray-700 dark:text-gray-300">Track expenses and income in one place</span>
+                    <span className="text-white">Track expenses and income in one place</span>
                   </li>
                   <li className="flex items-start">
                     <svg className="h-6 w-6 text-[#184A47] dark:text-green-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-gray-700 dark:text-gray-300">Create custom budgets for your spending</span>
+                    <span className="text-white">Create custom budgets for your spending</span>
                   </li>
                   <li className="flex items-start">
                     <svg className="h-6 w-6 text-[#184A47] dark:text-green-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-gray-700 dark:text-gray-300">Visualize spending with beautiful charts</span>
+                    <span className="text-white">Visualize spending with beautiful charts</span>
                   </li>
                   <li className="flex items-start">
                     <svg className="h-6 w-6 text-[#184A47] dark:text-green-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-gray-700 dark:text-gray-300">Set and achieve your financial goals</span>
+                    <span className="text-white">Set and achieve your financial goals</span>
                   </li>
                 </ul>
 
                 {/* Trust indicator */}
-                <div className="flex items-center border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="flex items-center border-t border-gray-700 pt-4">
                   <img
                     src="/assets/images/trusted-users.png"
                     alt="Trusted Users"
                     className="w-24 h-8 mr-3"
                   />
                   <div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Trusted by 30,000+ users worldwide</p>
+                    <p className="text-sm font-medium text-white">Trusted by 30,000+ users worldwide</p>
                     <div className="flex mt-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <svg key={star} className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -482,13 +482,13 @@ const AuthPage = () => {
             </div>
 
             {/* Right side - Authentication form */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+            <div className="bg-gray-800 rounded-xl shadow-lg p-8">
               {/* Mobile tab switcher */}
-              <div className="mb-6 flex border dark:border-gray-700 rounded-lg overflow-hidden">
+              <div className="mb-6 flex border border-gray-700 rounded-lg overflow-hidden">
                 <button
                   className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${activeView === 'login'
                     ? 'bg-[#184A47] text-white'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    : 'hover:bg-gray-700'
                     }`}
                   onClick={() => setActiveView('login')}
                 >
@@ -497,7 +497,7 @@ const AuthPage = () => {
                 <button
                   className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${activeView === 'register'
                     ? 'bg-[#184A47] text-white'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    : 'hover:bg-gray-700'
                     }`}
                   onClick={() => setActiveView('register')}
                 >
@@ -507,10 +507,10 @@ const AuthPage = () => {
 
               {/* Authentication forms */}
               <div>
-                <h2 className="text-2xl font-bold mb-2 text-[#292930] dark:text-white font-montserrat">
+                <h2 className="text-2xl font-bold mb-2 text-white font-montserrat">
                   {activeView === 'login' ? 'Sign in to your account' : 'Create a new account'}
                 </h2>
-                <p className="text-[#555555] dark:text-gray-300 mb-6 font-poppins">
+                <p className="text-white mb-6 font-poppins">
                   {activeView === 'login'
                     ? 'Enter your credentials below'
                     : 'Fill in your information to get started'
@@ -522,21 +522,21 @@ const AuthPage = () => {
                 {/* Form switcher at bottom */}
                 <div className="mt-6 text-center">
                   {activeView === 'login' ? (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-white">
                       Don't have an account?{' '}
                       <button
                         onClick={() => setActiveView('register')}
-                        className="text-[#184A47] dark:text-green-400 font-medium hover:underline"
+                        className="text-[#00A533] font-medium hover:underline"
                       >
                         Create one now
                       </button>
                     </p>
                   ) : (
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-white">
                       Already have an account?{' '}
                       <button
                         onClick={() => setActiveView('login')}
-                        className="text-[#184A47] dark:text-green-400 font-medium hover:underline"
+                        className="text-[#00A533] font-medium hover:underline"
                       >
                         Sign in
                       </button>
