@@ -59,7 +59,7 @@ import {
 
 export interface CategoryIcon {
   id: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string; size?: number; style?: React.CSSProperties }>;
   label: string;
   suggestedType: 'income' | 'expense' | 'both';
 }
