@@ -33,7 +33,7 @@ const Register = () => {
     // Must contain 10-15 digits total (excluding separators)
     // Allows spaces, dashes, and parentheses as separators
     const phoneRegex = /^\+[1-9]\d{1,14}$/;
-    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+    const cleanPhone = phone.replace(/[\s\-()]/g, '');
     return phoneRegex.test(cleanPhone);
   };
 

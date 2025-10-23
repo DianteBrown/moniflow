@@ -2,8 +2,28 @@ import { authService } from './authService';
 
 declare global {
   interface Window {
-    google: any;
+    google: {
+      accounts: {
+        id: {
+          initialize: (config: { client_id: string; callback: (response: GoogleCredentialResponse) => void }) => void;
+          renderButton: (element: HTMLElement | null, config: GoogleButtonConfig) => void;
+          prompt: () => void;
+        };
+      };
+    };
   }
+}
+
+interface GoogleCredentialResponse {
+  credential: string;
+}
+
+interface GoogleButtonConfig {
+  theme: string;
+  size: string;
+  width: string;
+  text: string;
+  shape: string;
 }
 
 export interface GoogleUser {
@@ -38,7 +58,7 @@ class GoogleAuthService {
     });
   }
 
-  private async handleCredentialResponse(response: any): Promise<void> {
+  private async handleCredentialResponse(response: GoogleCredentialResponse): Promise<void> {
     try {
       const result = await authService.googleAuth(response.credential);
       authService.setToken(result.token);

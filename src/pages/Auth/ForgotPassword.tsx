@@ -20,7 +20,7 @@ const ForgotPassword = () => {
     try {
       await authService.forgotPassword(email);
       toast.success("If an account exists with this email, you will receive a password reset link.");
-    } catch (error) {
+    } catch {
       toast.error("Failed to send reset email. Please try again.");
     } finally {
       setLoading(false);

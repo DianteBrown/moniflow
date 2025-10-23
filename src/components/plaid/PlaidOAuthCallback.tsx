@@ -4,7 +4,6 @@ import { plaidService } from '../../services/plaidService';
 
 export default function PlaidOAuthCallback() {
     const navigate = useNavigate();
-    const [isProcessing, setIsProcessing] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -20,7 +19,6 @@ export default function PlaidOAuthCallback() {
             } catch (error) {
                 console.error('OAuth callback error:', error);
                 setError('Failed to complete bank connection. Please try again.');
-                setIsProcessing(false);
             }
         };
 

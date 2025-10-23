@@ -41,7 +41,12 @@ export interface PlaidTransactionsResponse {
 }
 
 export interface PlaidSyncResponse {
-  data: any;
+  data: {
+    added: number;
+    modified: number;
+    removed: number;
+    transactions: PlaidTransaction[];
+  };
   cursor: string;
 }
 
@@ -54,6 +59,7 @@ export interface ConnectedBank {
   error_message?: string;
   last_successful_update?: string;
   created_at: string;
+  access_token?: string;
   plaid_accounts: PlaidAccountInfo[];
 }
 
@@ -78,14 +84,13 @@ export interface ConnectedBanksResponse {
 class PlaidService {
   private accessToken: string | null = null;
 
-  async createLinkToken(): Promise<PlaidLinkTokenResponse> {
-    // Don't send any body data - backend gets user from JWT token
-    const response = await api.post('/plaid/create-link-token');
-    console.log('createLinkToken function called', response.data);
+  async createLinkToken(accessToken?: string): Promise<PlaidLinkTokenResponse> {
+    const payload = accessToken ? { access_token: accessToken } : {};
+    const response = await api.post('/plaid/create-link-token', payload);
     return response.data;
   }
 
-  async exchangePublicToken(publicToken: string, institution_id: any): Promise<PlaidExchangeResponse> {
+  async exchangePublicToken(publicToken: string, institution_id: string): Promise<PlaidExchangeResponse> {
     const response = await api.post('/plaid/connect-bank', {
       public_token: publicToken,
       institution_id: institution_id
@@ -120,7 +125,7 @@ class PlaidService {
     return response.data;
   }
   // Add this method to your PlaidService class
-  async handleOAuthCallback(receivedRedirectUri: string): Promise<any> {
+  async handleOAuthCallback(receivedRedirectUri: string): Promise<{ success: boolean; message?: string }> {
     try {
       const response = await api.post('/plaid/oauth-callback', {
         receivedRedirectUri
@@ -136,7 +141,7 @@ class PlaidService {
   getAccessToken(): string | null {
     return this.accessToken;
   }
-
+ 
   // Method to set access token (useful for persistence)
   setAccessToken(token: string): void {
     this.accessToken = token;
@@ -149,14 +154,20 @@ class PlaidService {
   }
 
   // Sync all banks
-  async syncAllBanks(): Promise<any> {
+  async syncAllBanks(): Promise<{ success: boolean; message?: string }> {
     const response = await api.post('/plaid/sync-all-banks');
     return response.data;
   }
 
   // Disconnect a bank
-  async disconnectBank(bankId: string): Promise<any> {
+  async disconnectBank(bankId: string): Promise<{ success: boolean; message?: string }> {
     const response = await api.delete(`/plaid/disconnect-bank/${bankId}`);
+    return response.data;
+  }
+
+  // Remove a bank (permanently delete bank, accounts, and all transactions)
+  async removeBank(bankId: string): Promise<{ success: boolean; message?: string }> {
+    const response = await api.delete(`/plaid/remove-bank/${bankId}`);
     return response.data;
   }
 }
