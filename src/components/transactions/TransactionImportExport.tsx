@@ -249,7 +249,7 @@ const TransactionImportExport: React.FC<TransactionImportExportProps> = ({
           </DialogHeader>
 
           {/* CSV Format Info */}
-          <Alert variant="info" className="bg-blue-50 dark:bg-blue-950">
+          <Alert variant="info" className="" style={{backgroundColor: 'var(--heritage-cream)'}}>
             <Info className="h-4 w-4" />
             <AlertTitle>Required CSV Format</AlertTitle>
             <AlertDescription>

@@ -48,8 +48,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link to="/dashboard" className="flex items-center text-xl font-bold">
-              Moniflow
+            <Link to="/dashboard" className="flex items-center text-xl font-bold text-[var(--heritage-green)] dark:text-[var(--heritage-gold)]" style={{fontFamily: 'var(--font-heading)'}}>
+              Heritage Budgeting
             </Link>
 
             {/* Desktop Navigation */}
@@ -105,7 +105,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-30 bg-background/95 backdrop-blur-sm">
+        <div className="md:hidden fixed inset-0 top-16 z-50 bg-background/95 backdrop-blur-sm">
           <nav className="flex flex-col p-6 space-y-4">
             {menuItems.map((item) => (
               <Link

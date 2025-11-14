@@ -80,7 +80,6 @@ export default function BankAccounts({ onRefresh, availablePeriods, selectedPeri
 
   // Disconnect bank handler
   const handleDisconnectBank = async (bankId: string) => {
-    console.log('Disconnecting bank with ID:', bankId);
     if (!bankId) {
       console.error('Invalid bank ID');
       return;
@@ -98,11 +97,10 @@ export default function BankAccounts({ onRefresh, availablePeriods, selectedPeri
 
   // Remove bank handler
   const handleRemoveBank = async (bankId: string) => {
-    console.log('Removing bank with ID:', bankId);
     if (!bankId) {
       throw new Error('Invalid bank ID');
     }
-    
+
     try {
       await removeBankMutation.mutateAsync(bankId);
       // ✅ Force component refresh
@@ -116,7 +114,6 @@ export default function BankAccounts({ onRefresh, availablePeriods, selectedPeri
   };
 
   const handleReconnectBank = async (bankId: string) => {
-    console.log('Reconnecting bank with ID:', bankId);
     if (!bankId) {
       toast.error('Invalid bank ID');
       return;
@@ -132,7 +129,7 @@ export default function BankAccounts({ onRefresh, availablePeriods, selectedPeri
       // For removed banks, don't pass access_token (it's cleared)
       // For disconnected banks, use existing access_token for update mode
       const accessToken = bank.status === 'removed' ? undefined : bank.access_token;
-      
+
       if (bank.status === 'disconnected' && !accessToken) {
         toast.error('Bank access token not found. Please remove and re-add this bank.');
         return;
@@ -152,18 +149,14 @@ export default function BankAccounts({ onRefresh, availablePeriods, selectedPeri
     token: linkToken,
     onSuccess: async (publicToken: string, metadata: any) => {
       try {
-        console.log('Plaid Link Success:', { publicToken, metadata });
-
         // Exchange public token for access token
-        const response = await plaidService.exchangePublicToken(publicToken, metadata.institution.institution_id);
-        console.log('Exchange response:', response);
+        await plaidService.exchangePublicToken(publicToken, metadata.institution.institution_id);
 
         setSyncStatus('syncing');
         setLinkToken(null);
 
         // Sync transactions from all connected banks
-        const syncResult = await plaidService.syncAllBanks();
-        console.log('Sync result:', syncResult);
+        await plaidService.syncAllBanks();
 
         // ✅ Invalidate and refetch ALL relevant data
         await Promise.all([
@@ -225,11 +218,7 @@ export default function BankAccounts({ onRefresh, availablePeriods, selectedPeri
         setLinkToken(null); // Reset link token on error
       }
     },
-    onExit: (error: any, metadata: any) => {
-      console.log('Plaid Link Exit:', { error, metadata });
-      console.log('Exit reason:', error?.error_code || 'No error code');
-      console.log('Metadata:', metadata);
-
+    onExit: (error: any, _metadata: any) => {
       if (error) {
         console.error('Plaid Link error:', error);
         // Provide more specific error messages
@@ -262,7 +251,6 @@ export default function BankAccounts({ onRefresh, availablePeriods, selectedPeri
   });
   useEffect(() => {
     if (linkToken && ready) {
-      console.log('Opening Plaid Link...');
       // Add a small delay to ensure the modal opens properly
       setTimeout(() => {
         open();

@@ -58,7 +58,6 @@ export interface BulkImportResponse {
 class TransactionService {
   async getTransactions(): Promise<Transaction[]> {
     const response = await api.get<{ transactions: Transaction[] }>('/budget/transactions');
-    console.log(response.data.transactions);
     return response.data.transactions;
   }
 

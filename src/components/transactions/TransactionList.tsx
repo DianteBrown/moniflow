@@ -150,7 +150,8 @@ export default function TransactionList({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              className="h-8 w-8 hover:opacity-80"
+                              style={{color: 'var(--heritage-green)'}}
                               onClick={() => onEditClick(transaction)}
                             >
                               <Edit2 className="h-4 w-4" />

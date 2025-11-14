@@ -33,7 +33,7 @@ export default function Phone() {
             {/* phone frame (metal chassis + bezel) */}
             <div className="relative w-[370px] max-w-full aspect-[9/19.5] rounded-[2.6rem] p-[10px] bg-gradient-to-b from-zinc-200/40 via-zinc-500/30 to-zinc-200/40 border border-zinc-400/20 shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
                 {/* inner chassis */}
-                <div className="relative h-full w-full rounded-[2.2rem] bg-black ring-1 ring-zinc-700/60 overflow-hidden">
+                <div className="relative h-full w-full rounded-[2.2rem] ring-1 ring-zinc-700/60 overflow-hidden" style={{backgroundColor: 'var(--heritage-green)'}}>
                     {/* antenna bands (decor) */}
                     <div className="absolute top-6 left-1/3 w-12 h-[2px] bg-zinc-300/30 rounded" />
                     <div className="absolute bottom-6 left-1/4 w-16 h-[2px] bg-zinc-300/20 rounded" />
@@ -54,17 +54,17 @@ export default function Phone() {
 
                         {/* Title */}
                         <div className="px-5 mt-3">
-                            <h1 className="text-zinc-100 font-semibold tracking-tight">Moniflow</h1>
+                            <h1 className="text-zinc-100 font-semibold tracking-tight">Heritage Budgeting</h1>
                         </div>
 
                         {/* Search + quick filter bar */}
                         <div className="px-5 mt-3">
                             <div className="flex items-center gap-2">
-                                <button className="flex-none inline-flex items-center justify-center w-9 h-9 rounded-xl bg-violet-600/90 text-white/90">
+                                <button className="flex-none inline-flex items-center justify-center w-9 h-9 rounded-xl text-white/90" style={{backgroundColor: 'var(--heritage-gold)'}}>
                                     <ChevronLeft size={18} />
                                 </button>
 
-                                <div className="flex-1 grid grid-cols-[1fr_auto] gap-2 bg-violet-700/70 rounded-xl p-2">
+                                <div className="flex-1 grid grid-cols-[1fr_auto] gap-2 rounded-xl p-2" style={{backgroundColor: 'var(--heritage-light-green)'}}>
                                     <div className="flex items-center gap-2 text-white/90">
                                         <Search size={16} className="opacity-90" />
                                         <input

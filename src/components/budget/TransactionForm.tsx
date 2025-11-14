@@ -203,10 +203,8 @@ export default function TransactionForm({
         <Button 
           type="submit"
           disabled={!formData.amount || !formData.category || isSubmitting}
-          className={cn(
-            formData.type === 'income' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700',
-            'min-w-[120px]'
-          )}
+          className="min-w-[120px] text-white hover:opacity-90"
+          style={{backgroundColor: formData.type === 'income' ? 'var(--heritage-gold)' : 'var(--heritage-green)'}}
         >
           {isSubmitting ? (
             <div className="flex items-center gap-2">

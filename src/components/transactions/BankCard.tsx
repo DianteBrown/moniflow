@@ -269,7 +269,6 @@ const BankCard = ({ bank, onDisconnect, onRemove, onReconnect }: BankCardProps) 
                     timeoutPromise
                   ]);
                   // Success: close dialog and reset state
-                  console.log('Bank removal successful, closing dialog');
                   setShowRemoveDialog(false);
                   setIsRemoving(false);
                   setDropdownOpen(false);

@@ -381,7 +381,7 @@ export default function AnalysisSection() {
       <CardContent className="p-6 space-y-8">
         {/* Premium Banner */}
         {!hasAdvancedCharts && (
-          <div className="bg-gradient-to-r from-purple-500 to-blue-500 text-white p-4 rounded-lg mb-4 shadow-md">
+          <div className="bg-gradient-to-r from-[#1B4332] to-[#2D5F4C] text-white p-4 rounded-lg mb-4 shadow-md border border-[#C9A870]/20">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold mb-1">Upgrade to Premium</h3>
@@ -390,7 +390,7 @@ export default function AnalysisSection() {
               <Button
                 variant="default"
                 size="sm"
-                className="bg-white text-blue-600 hover:bg-blue-50 border-none"
+                className="bg-[#C9A870] hover:bg-[#D4AF6A] border-none text-[#1B4332] font-semibold"
                 onClick={() => window.location.href = '/subscription/manage'}
               >
                 Upgrade Now
@@ -584,7 +584,8 @@ export default function AnalysisSection() {
                     interval={
                       viewPeriod === 'week' ? 0 :
                         viewPeriod === 'month' ? 2 :
-                          viewPeriod === '3months' || viewPeriod === '6months' ? 7 :
+                          viewPeriod === '3months'? 7 :
+                           viewPeriod === '6months' ? 15 :
                             viewPeriod === 'year' ? 0 : 2
                     }
                     tickFormatter={(tick) => tick}
@@ -593,11 +594,16 @@ export default function AnalysisSection() {
                     tick={{ fill: '#6B7280', fontSize: 12 }}
                   />
                   <YAxis
-                    tickFormatter={(tick) => `$${tick}`}
+                    tickFormatter={(tick) => {
+                      if (tick >= 1000) {
+                        return `$${(tick / 1000).toFixed(0)}K`;
+                      }
+                      return `$${tick}`;
+                    }}
                     width={60}
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#6B7280', fontSize: 12 }}
+                    tick={{ fill: '#6B7280', fontSize: 15 }}
                   />
                   <Tooltip
                     formatter={(value: number) => [
@@ -619,7 +625,8 @@ export default function AnalysisSection() {
                       backgroundColor: 'rgba(255, 255, 255, 0.9)',
                       border: '1px solid #e5e7eb',
                       borderRadius: '0.375rem',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      color: 'var(--heritage-green)',
                     }}
                   />
                   <Legend

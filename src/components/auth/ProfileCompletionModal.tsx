@@ -1,4 +1,3 @@
-// Updated src/components/auth/ProfileCompletionModal.tsx
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -155,7 +154,8 @@ export default function ProfileCompletionModal({ isOpen, onComplete }: ProfileCo
           
           <Button 
             type="submit" 
-            className="w-full bg-[#184A47] hover:bg-[#123a38]" 
+            className="w-full" 
+            style={{backgroundColor: 'var(--heritage-green)'}}
             disabled={isLoading}
           >
             {isLoading ? 'Completing...' : 'Complete Profile'}

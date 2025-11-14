@@ -212,13 +212,11 @@ export default function TransactionDashboard({
     setSelectedTypes([]);
   };
   const onEditClick = (transaction: Transaction) => {
-    console.log('Edit clicked for transaction:', transaction);
     setSelectedTransaction(transaction);
     setIsEditModalOpen(true);
   };
 
   const onDeleteClick = (transaction: Transaction) => {
-    console.log('Delete clicked for transaction:', transaction);
     setTransactionToDelete(transaction);
     setIsDeleteModalOpen(true);
   };
@@ -365,9 +363,10 @@ export default function TransactionDashboard({
                                     <div
                                       key={bank}
                                       className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${selectedBanks.includes(bank)
-                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                                        ? ''
                                         : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                                         }`}
+                                      style={selectedBanks.includes(bank) ? {backgroundColor: 'var(--heritage-cream)', color: 'var(--heritage-green)'} : {}}
                                       onClick={() => toggleBankFilter(bank)}
                                     >
                                       <span className="text-sm font-medium">{bank}</span>
@@ -432,9 +431,10 @@ export default function TransactionDashboard({
                                     <div
                                       key={category.id}
                                       className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${selectedCategories.includes(category.id)
-                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                                        ? ''
                                         : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                                         }`}
+                                      style={selectedCategories.includes(category.id) ? {backgroundColor: 'var(--heritage-cream)', color: 'var(--heritage-green)'} : {}}
                                       onClick={() => toggleCategoryFilter(category.id)}
                                     >
                                       <div className="flex items-center space-x-2">
@@ -490,7 +490,8 @@ export default function TransactionDashboard({
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setSelectedTypes([])}
-                                    className="text-xs text-blue-600 hover:text-gray-700"
+                                    className="text-xs hover:opacity-80"
+                                    style={{color: 'var(--heritage-green)'}}
                                   >
                                     Clear All
                                   </Button>

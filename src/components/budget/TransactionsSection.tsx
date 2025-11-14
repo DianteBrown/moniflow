@@ -132,7 +132,7 @@ export default function TransactionsSection() {
         <Card className="border dark:border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between py-2 px-3">
             <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-blue-500" />
+              <DollarSign className="h-4 w-4" style={{color: 'var(--heritage-gold)'}} />
               <CardTitle className="text-sm font-medium">Balance</CardTitle>
             </div>
             {loading ? (

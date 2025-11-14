@@ -1,7 +1,7 @@
 const Testimonials = () => {
   const testimonials = [
     {
-      text: "Moniflow has completely changed how I manage my money. I've saved over $3,000 in the past year just by being more aware of my spending habits.",
+      text: "Heritage Budgeting has completely changed how I manage my money. I've saved over $3,000 in the past year just by being more aware of my spending habits.",
       author: "Alex Johnson",
       role: "Marketing Manager"
     },
@@ -11,7 +11,7 @@ const Testimonials = () => {
       role: "Graphic Designer"
     },
     {
-      text: "I've tried several budgeting apps, but Moniflow stands out with its clean interface and powerful analytics. It's become an essential part of my financial planning.",
+      text: "I've tried several budgeting apps, but Heritage Budgeting stands out with its clean interface and powerful analytics. It's become an essential part of my financial planning.",
       author: "Michael Chen",
       role: "Software Engineer"
     }

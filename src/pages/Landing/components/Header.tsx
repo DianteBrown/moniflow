@@ -36,16 +36,17 @@ const Header = ({ onSignIn, onGetStarted }: HeaderProps) => {
     <header className={`header ${scrolled ? "shadow-md" : ""}`}>
       <div className="header-container">
         <Link to="/" className="logo">
-          <span>Moniflow</span>
+          <img src="/assets/images/logo-1.svg" alt="Heritage Budgeting" className="logo-image" />
+          <span>Heritage Budgeting</span>
         </Link>
-        
+
         {/* Desktop Navigation */}
         <nav className="desktop-nav">
           <button onClick={() => scrollToSection('features')} className="nav-link">Features</button>
           <button onClick={() => scrollToSection('about')} className="nav-link">About</button>
         </nav>
-        
-        <button 
+
+        <button
           className="menu-toggle"
           onClick={toggleMenu}
           aria-label="Toggle menu"
@@ -55,11 +56,11 @@ const Header = ({ onSignIn, onGetStarted }: HeaderProps) => {
             <path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z" />
           </svg>
         </button>
-                
+
         {/* Desktop buttons */}
         <div className="header-buttons">
-          <button 
-            onClick={onSignIn} 
+          <button
+            onClick={onSignIn}
             className="signin"
           >
             Sign In

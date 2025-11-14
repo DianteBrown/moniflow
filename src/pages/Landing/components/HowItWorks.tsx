@@ -22,7 +22,7 @@ const HowItWorks = () => {
       <div className="how-it-works-container">
         <div className="how-it-works-header">
           <p className="how-it-works-title">HOW IT WORKS</p>
-          <h2 className="how-it-works-subtitle">Getting started with Moniflow is quick and easy</h2>
+          <h2 className="how-it-works-subtitle">Getting started with Heritage Budgeting is quick and easy</h2>
         </div>
         
         <div className="steps-container">

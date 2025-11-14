@@ -27,7 +27,7 @@ const KeyFeatures = () => {
     <section id="features" className="py-20 bg-[var(--gray-background)]">
       <div className="mx-auto max-w-7xl px-4">
         <div className="text-center mb-16">
-          <h2 className="text-xl md:text-4xl font-bold text-[#ffffff] tracking-widest uppercase mb-3">Features</h2>
+          <h2 className="text-xl md:text-4xl font-bold text-[text-gray] tracking-widest uppercase mb-3">Features</h2>
         </div>
 
         <div className="grid  grid-cols-1 md:grid-cols-4 gap-8">
@@ -41,8 +41,8 @@ const KeyFeatures = () => {
                 alt={feature.title}
                 className="h-14 w-14 mb-6"
               />
-              <h3 className="text-xl font-bold text-[#ffffff] mb-4">{feature.title}</h3>
-              <p className="text-[#ffffff] mb-4 text-center">{feature.description}</p>
+                <h3 className="text-xl font-bold text-[text-gray] mb-4">{feature.title}</h3>
+              <p className="text-[text-gray] mb-4 text-center">{feature.description}</p>
             </div>
           ))}
         </div>
