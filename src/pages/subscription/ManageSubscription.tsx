@@ -243,7 +243,7 @@ const ManageSubscription = () => {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle className="text-xl">Moniflow+</CardTitle>
+                    <CardTitle className="text-xl">Heritage Budgeting+</CardTitle>
                     <CardDescription>Premium experience</CardDescription>
                   </div>
                   {isPremium && (

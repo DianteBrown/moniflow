@@ -344,7 +344,7 @@ export default function Profile() {
           <div className="flex justify-end pt-4">
             <Button
               type="submit"
-              className="bg-[#FF0000] hover:bg-[#00A626]/90 text-white border-none px-5 py-2.5 rounded-md scale-110 font-medium"
+              className="bg-[#FF0000] hover:bg-[#EE0000]/90 text-white border-none px-5 py-2.5 rounded-md scale-110 font-medium"
               disabled={isChangingPassword}
             >
               <Lock className="h-4 w-4 mr-2" />

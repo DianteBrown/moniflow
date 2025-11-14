@@ -49,7 +49,6 @@ function LoginForm() {
 
         // Add a delay before navigation to ensure the toast is seen and token is stored
         setTimeout(() => {
-          console.log('Navigating to dashboard with token:', localStorage.getItem('token'));
           window.location.href = '/dashboard'; // Use direct navigation instead of navigate()
         }, 500);
       } else {
@@ -86,7 +85,7 @@ function LoginForm() {
         </div>
       )}
       <div className="space-y-2">
-        <Label htmlFor="email-login" className="text-white">Email</Label>
+        <Label htmlFor="email-login" style={{ color: 'var(--heritage-green)' }}>Email</Label>
         <Input
           id="email-login"
           type="email"
@@ -95,15 +94,17 @@ function LoginForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="email"
-          className="text-white"
+          style={{ color: 'var(--text-gray)' }} className=""
         />
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="password-login" className="text-white">Password</Label>
+          <Label htmlFor="password-login" style={{ color: 'var(--heritage-green)' }}>Password</Label>
           <Link
             to="/forgot-password"
-            className="text-sm font-medium text-[#00A533] hover:text-[#00A533]/80"
+            className="text-sm font-medium hover:underline"
+            style={{ color: 'var(--heritage-gold)' }}
+
           >
             Forgot password?
           </Link>
@@ -116,10 +117,10 @@ function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="current-password"
-          className="text-white"
+          style={{ color: 'var(--text-gray)' }} className=""
         />
       </div>
-      <Button type="submit" className="w-full bg-[#184A47] hover:bg-[#123a38]" disabled={isLoading}>
+      <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--heritage-green)', color: 'white' }} disabled={isLoading}>
         {isLoading ? 'Signing in...' : 'Sign in'}
       </Button>
       <div className="mt-6">
@@ -128,7 +129,7 @@ function LoginForm() {
             <div className="w-full border-t border-gray-700" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-[#060609] text-white">Or continue with</span>
+            <span className="px-2" style={{ backgroundColor: 'var(--heritage-warm-bg)', color: 'var(--text-gray)' }}>Or continue with</span>
           </div>
         </div>
 
@@ -224,10 +225,6 @@ function RegisterForm() {
         password,
       });
 
-      // Log the response and token
-      console.log('Registration response:', response);
-      console.log('Token after registration:', localStorage.getItem('token'));
-
       // Force token storage
       if (response && response.token) {
         localStorage.setItem('token', response.token);
@@ -237,7 +234,6 @@ function RegisterForm() {
 
         // Add a delay before navigation to ensure the toast is seen and token is stored
         setTimeout(() => {
-          console.log('Navigating to dashboard with token:', localStorage.getItem('token'));
           window.location.href = '/dashboard'; // Use direct navigation instead of navigate()
         }, 500);
       } else {
@@ -272,7 +268,7 @@ function RegisterForm() {
         </div>
       )}
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-white">Full Name</Label>
+        <Label htmlFor="name" style={{ color: 'var(--heritage-green)' }}>Full Name</Label>
         <Input
           id="name"
           type="text"
@@ -281,11 +277,11 @@ function RegisterForm() {
           onChange={(e) => setName(e.target.value)}
           required
           autoComplete="name"
-          className="text-white"
+          style={{ color: 'var(--text-gray)' }} className=""
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="phone_number" className="text-white">Phone Number</Label>
+        <Label htmlFor="phone_number" style={{ color: 'var(--heritage-green)' }}>Phone Number</Label>
         <div className="relative">
           <Input
             id="phone_number"
@@ -320,7 +316,7 @@ function RegisterForm() {
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email-register" className="text-white">Email</Label>
+        <Label htmlFor="email-register" style={{ color: 'var(--heritage-green)' }}>Email</Label>
         <Input
           id="email-register"
           type="email"
@@ -329,12 +325,12 @@ function RegisterForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="email"
-          className="text-white"
+          style={{ color: 'var(--text-gray)' }} className=""
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password-register" className="text-white">Password</Label>
+        <Label htmlFor="password-register" style={{ color: 'var(--heritage-green)' }}>Password</Label>
         <Input
           id="password-register"
           type="password"
@@ -343,11 +339,11 @@ function RegisterForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="new-password"
-          className="text-white"
+          style={{ color: 'var(--text-gray)' }} className=""
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="confirm-password" className="text-white">Confirm Password</Label>
+        <Label htmlFor="confirm-password" style={{ color: 'var(--heritage-green)' }}>Confirm Password</Label>
         <Input
           id="confirm-password"
           type="password"
@@ -356,10 +352,10 @@ function RegisterForm() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
           autoComplete="new-password"
-          className="text-white"
+          style={{ color: 'var(--text-gray)' }} className=""
         />
       </div>
-      <Button type="submit" className="w-full bg-[#184A47] hover:bg-[#123a38]" disabled={isLoading}>
+      <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--heritage-green)', color: 'white' }} disabled={isLoading}>
         {isLoading ? 'Creating account...' : 'Create account'}
       </Button>
       <div className="mt-6">
@@ -394,13 +390,13 @@ const AuthPage = () => {
   }, [location]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#060609]">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--heritage-warm-bg)' }}>
       {/* Header */}
-      <header className="fixed top-0 left-0 w-full bg-black p-4 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-2 font-semibold text-white">
-            <img src="/assets/images/moniflow-logo.svg" alt="Moniflow Logo" height="28" width="28" />
-            <span className="text-xl font-sora">Moniflow</span>
+      <header className="header">
+        <div className="header-container">
+          <Link to="/" className="logo">
+            <img src="/assets/images/logo-1.svg" alt="Heritage Budgeting" className="logo-image" />
+            <span>Heritage Budgeting</span>
           </Link>
         </div>
       </header>
@@ -408,16 +404,16 @@ const AuthPage = () => {
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4 pt-24">
         <div className="w-full max-w-6xl">
-          <div className="grid md:grid-cols-2 gap-8 items-start">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
             {/* Left side - Hero text */}
-            <div className="flex flex-col justify-center p-6">
-              <h1 className="text-4xl font-bold text-white mb-4 font-montserrat">
+            <div className="flex flex-col justify-center p-6 w-full">
+              <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--heritage-green)', fontFamily: 'var(--font-heading)' }}>
                 {activeView === "login"
                   ? "Welcome back!"
                   : "Start your financial journey"
                 }
               </h1>
-              <p className="text-lg text-white mb-6 font-poppins">
+              <p className="text-lg mb-6" style={{ color: 'var(--text-gray)', fontFamily: 'var(--font-body)' }}>
                 {activeView === "login"
                   ? "Sign in to your account to manage your finances and track your budget with ease."
                   : "Create an account to start tracking your expenses, setting budgets, and achieving your financial goals. Your data is encrypted and secure."
@@ -425,8 +421,8 @@ const AuthPage = () => {
               </p>
 
               {/* Benefits section instead of screenshot */}
-              <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-md">
-                <h3 className="text-xl font-semibold text-white mb-4 font-montserrat">
+              <div className="rounded-xl p-6 border shadow-md" style={{ backgroundColor: '#FFFFFF', borderColor: 'var(--heritage-cream)' }}>
+                <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--heritage-green)', fontFamily: 'var(--font-heading)' }}>
                   {activeView === "login"
                     ? "Your financial dashboard awaits"
                     : "Join thousands already saving money"
@@ -435,40 +431,40 @@ const AuthPage = () => {
 
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-start">
-                    <svg className="h-6 w-6 text-[#184A47] dark:text-green-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-6 w-6 mr-2 flex-shrink-0" style={{ color: 'var(--heritage-gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-white">Track expenses and income in one place</span>
+                    <span style={{ color: 'var(--text-gray)' }}>Track expenses and income in one place</span>
                   </li>
                   <li className="flex items-start">
-                    <svg className="h-6 w-6 text-[#184A47] dark:text-green-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-6 w-6 mr-2 flex-shrink-0" style={{ color: 'var(--heritage-gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-white">Create custom budgets for your spending</span>
+                    <span style={{ color: 'var(--text-gray)' }}>Create custom budgets for your spending</span>
                   </li>
                   <li className="flex items-start">
-                    <svg className="h-6 w-6 text-[#184A47] dark:text-green-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-6 w-6 mr-2 flex-shrink-0" style={{ color: 'var(--heritage-gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-white">Visualize spending with beautiful charts</span>
+                    <span style={{ color: 'var(--text-gray)' }}>Visualize spending with beautiful charts</span>
                   </li>
                   <li className="flex items-start">
-                    <svg className="h-6 w-6 text-[#184A47] dark:text-green-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-6 w-6 mr-2 flex-shrink-0" style={{ color: 'var(--heritage-gold)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-white">Set and achieve your financial goals</span>
+                    <span style={{ color: 'var(--text-gray)' }}>Set and achieve your financial goals</span>
                   </li>
                 </ul>
 
                 {/* Trust indicator */}
-                <div className="flex items-center border-t border-gray-700 pt-4">
+                <div className="flex items-center border-t pt-4" style={{ borderColor: 'var(--heritage-cream)' }}>
                   <img
                     src="/assets/images/trusted-users.png"
                     alt="Trusted Users"
                     className="w-24 h-8 mr-3"
                   />
                   <div>
-                    <p className="text-sm font-medium text-white">Trusted by 30,000+ users worldwide</p>
+                    <p className="text-sm font-medium" style={{ color: 'var(--heritage-green)' }}>Trusted by 30,000+ users worldwide</p>
                     <div className="flex mt-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <svg key={star} className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
@@ -482,23 +478,25 @@ const AuthPage = () => {
             </div>
 
             {/* Right side - Authentication form */}
-            <div className="bg-gray-800 rounded-xl shadow-lg p-8">
+            <div className="rounded-xl shadow-lg p-8" style={{ backgroundColor: '#FFFFFF' }}>
               {/* Mobile tab switcher */}
-              <div className="mb-6 flex border border-gray-700 rounded-lg overflow-hidden">
+              <div className="mb-6 flex border rounded-lg overflow-hidden" style={{ borderColor: 'var(--heritage-cream)' }}>
                 <button
-                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${activeView === 'login'
-                    ? 'bg-[#184A47] text-white'
-                    : 'hover:bg-gray-700'
-                    }`}
+                  className="flex-1 py-3 px-4 text-center font-medium transition-colors"
+                  style={activeView === 'login'
+                    ? { backgroundColor: 'var(--heritage-green)', color: 'white' }
+                    : { color: 'var(--text-gray)' }
+                  }
                   onClick={() => setActiveView('login')}
                 >
                   Sign In
                 </button>
                 <button
-                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${activeView === 'register'
-                    ? 'bg-[#184A47] text-white'
-                    : 'hover:bg-gray-700'
-                    }`}
+                  className="flex-1 py-3 px-4 text-center font-medium transition-colors"
+                  style={activeView === 'register'
+                    ? { backgroundColor: 'var(--heritage-green)', color: 'white' }
+                    : { color: 'var(--text-gray)' }
+                  }
                   onClick={() => setActiveView('register')}
                 >
                   Create Account
@@ -507,10 +505,10 @@ const AuthPage = () => {
 
               {/* Authentication forms */}
               <div>
-                <h2 className="text-2xl font-bold mb-2 text-white font-montserrat">
+                <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--heritage-green)', fontFamily: 'var(--font-heading)' }}>
                   {activeView === 'login' ? 'Sign in to your account' : 'Create a new account'}
                 </h2>
-                <p className="text-white mb-6 font-poppins">
+                <p className="mb-6" style={{ color: 'var(--text-gray)', fontFamily: 'var(--font-body)' }}>
                   {activeView === 'login'
                     ? 'Enter your credentials below'
                     : 'Fill in your information to get started'
@@ -522,21 +520,23 @@ const AuthPage = () => {
                 {/* Form switcher at bottom */}
                 <div className="mt-6 text-center">
                   {activeView === 'login' ? (
-                    <p className="text-sm text-white">
+                    <p className="text-sm" style={{ color: 'var(--text-gray)' }}>
                       Don't have an account?{' '}
                       <button
                         onClick={() => setActiveView('register')}
-                        className="text-[#00A533] font-medium hover:underline"
+                        className="font-medium hover:underline"
+                        style={{ color: 'var(--heritage-gold)' }}
                       >
                         Create one now
                       </button>
                     </p>
                   ) : (
-                    <p className="text-sm text-white">
+                    <p className="text-sm" style={{ color: 'var(--text-gray)' }}>
                       Already have an account?{' '}
                       <button
                         onClick={() => setActiveView('login')}
-                        className="text-[#00A533] font-medium hover:underline"
+                        className="font-medium hover:underline"
+                        style={{ color: 'var(--heritage-gold)' }}
                       >
                         Sign in
                       </button>

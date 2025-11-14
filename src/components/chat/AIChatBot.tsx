@@ -22,7 +22,7 @@ export default function AIChatBot({ className }: AIChatBotProps) {
     {
       id: '1',
       text:
-        "Welcome to Moniflow. I’m your Copilot for budgets, spending, and goals, so you can stress less and save more. How can I help?",
+        "Welcome to Heritage Budgeting. I'm your Copilot for budgets, spending, and goals, so you can stress less and save more. How can I help?",
       sender: 'bot',
       timestamp: new Date()
     },
@@ -201,15 +201,16 @@ export default function AIChatBot({ className }: AIChatBotProps) {
       <div
         className={cn(
           'flex items-center rounded-t-2xl px-4 py-3',
-          'bg-[#060609] text-white'
+          'text-white',
+          'bg-[var(--heritage-green)] dark:bg-[var(--heritage-light-green)]'
         )}
       >
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center">
-            <img src="/assets/images/AI bot.png" alt="Moniflow Copilot" className="h-full w-full" />
+            <img src="/assets/images/AI bot.png" alt="Heritage Budgeting Copilot" className="h-full w-full" />
           </div>
           <div>
-            <h1 className="text-base font-semibold">Moniflow Copilot</h1>
+            <h1 className="text-base font-semibold">Heritage Budgeting Copilot</h1>
             <p className="text-xs text-gray-300">
               Your money, organized. Bills, budgets, goals, and alerts with me.
             </p>
@@ -239,13 +240,11 @@ export default function AIChatBot({ className }: AIChatBotProps) {
               >
                 {/* Avatar */}
                 <div
-                  className={cn(
-                    'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full',
-                    message.sender === 'bot' ? '' : 'bg-purple-600'
-                  )}
+                  className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
+                  style={message.sender === 'user' ? {backgroundColor: 'var(--heritage-green)'} : {}}
                 >
                   {message.sender === 'bot' ? (
-                    <img src="/assets/images/AI copilot.png" alt="Moniflow Copilot" className="h-full w-full" />
+                    <img src="/assets/images/AI copilot.png" alt="Heritage Budgeting Copilot" className="h-full w-full" />
                   ) : (
                     <User className="h-4 w-4 text-white" />
                   )}
@@ -257,9 +256,10 @@ export default function AIChatBot({ className }: AIChatBotProps) {
                     className={cn(
                       'inline-block rounded-lg px-4 py-3 leading-relaxed shadow-sm ring-1',
                       message.sender === 'user'
-                        ? 'bg-purple-600 text-white ring-transparent'
+                        ? 'text-white ring-transparent'
                         : 'bg-white/95 text-gray-900 ring-gray-200 dark:bg-gray-700/90 dark:text-gray-100 dark:ring-gray-600'
                     )}
+                    style={message.sender === 'user' ? {backgroundColor: 'var(--heritage-green)'} : {}}
                   >
                     {message.sender === 'bot' ? formatMessage(message.text) : message.text}
                   </div>
@@ -273,7 +273,7 @@ export default function AIChatBot({ className }: AIChatBotProps) {
             {isTyping && (
               <div className="mr-auto flex max-w-4xl gap-4">
                 <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-                  <img src="/assets/images/AI copilot.png" alt="Moniflow Copilot" className="h-full w-full" />
+                  <img src="/assets/images/AI copilot.png" alt="Heritage Budgeting Copilot" className="h-full w-full" />
                 </div>
                 <div className="flex-1">
                   <div className="inline-block rounded-lg bg-transparent px-4 py-3">
@@ -298,22 +298,21 @@ export default function AIChatBot({ className }: AIChatBotProps) {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Message Moniflow Copilot..."
-                className="w-full rounded-xl border-gray-300 pr-12 py-3 text-base shadow-sm
-                           focus:border-blue-500 focus:ring-2 focus:ring-blue-200
-                           dark:border-gray-600 dark:focus:border-blue-500 dark:focus:ring-blue-900/40"
+                placeholder="Message Heritage Budgeting Copilot..."
+                className="w-full rounded-xl pr-12 py-3 text-base shadow-sm border-gray-300 dark:border-gray-600 focus:border-[var(--heritage-green)] focus:ring-2 focus:ring-[var(--heritage-green)]/20"
               />
             </div>
             <Button
               onClick={handleSendMessage}
               disabled={!inputValue.trim() || isTyping}
-              className="rounded-xl bg-blue-600 px-4 py-3 font-medium text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
+              className="rounded-xl px-4 py-3 font-medium shadow-sm disabled:opacity-60 hover:opacity-90"
+              style={{backgroundColor: 'var(--heritage-gold)', color: 'var(--heritage-green)'}}
             >
               <Send className="h-4 w-4" />
             </Button>
           </div>
           <p className="mt-2 text-center text-xs text-gray-500 dark:text-gray-400">
-            Moniflow Copilot can make mistakes. Consider checking important information.
+            Heritage Budgeting Copilot can make mistakes. Consider checking important information.
           </p>
         </div>
       </div>

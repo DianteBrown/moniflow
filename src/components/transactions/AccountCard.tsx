@@ -17,9 +17,9 @@ const AccountCard = ({ account }: AccountCardProps) => {
 
   const getAccountIcon = (type: string, subtype: string) => {
     if (type === 'credit' || subtype === 'credit card') {
-      return <CreditCard className="h-5 w-5 text-blue-600" />;
+      return <CreditCard className="h-5 w-5" style={{color: 'var(--heritage-gold)'}} />;
     }
-    return <DollarSign className="h-5 w-5 text-green-600" />;
+    return <DollarSign className="h-5 w-5" style={{color: 'var(--heritage-green)'}} />;
   };
 
   return (

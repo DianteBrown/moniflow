@@ -192,7 +192,8 @@ export default function CategoryPanel({
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-full aspect-square text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-none" 
+                        className="h-full aspect-square rounded-none hover:opacity-80"
+                        style={{color: 'var(--heritage-green)'}} 
                         onClick={() => handleOpenEditModal(category)}
                         title="Edit category"
                       >
@@ -236,7 +237,8 @@ export default function CategoryPanel({
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-full aspect-square text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-none" 
+                        className="h-full aspect-square rounded-none hover:opacity-80"
+                        style={{color: 'var(--heritage-green)'}} 
                         onClick={() => handleOpenEditModal(category)}
                         title="Edit category"
                       >

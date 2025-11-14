@@ -1,4 +1,3 @@
-// Update src/pages/Dashboard/Dashboard.tsx
 import { useState, useEffect } from 'react';
 import BudgetLayout from "@/components/budget/BudgetLayout";
 import ProfileCompletionModal from "@/components/auth/ProfileCompletionModal";
